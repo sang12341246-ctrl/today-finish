@@ -3,14 +3,19 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { format, subDays, parseISO } from 'date-fns';
 import { Calendar } from '@/components/Calendar';
+import { Heatmap } from '@/components/Heatmap';
+import { PhotoModal } from '@/components/PhotoModal';
 import { supabase } from '@/lib/supabase';
 
 export default function ParentPage() {
     const router = useRouter();
-    const [markedDates, setMarkedDates] = useState<string[]>([]);
+    const [logs, setLogs] = useState<{ study_date: string; image_url: string | null }[]>([]);
     const [loading, setLoading] = useState(true);
     const [familyCode, setFamilyCode] = useState('');
+    const [streak, setStreak] = useState(0);
+    const [selectedImage, setSelectedImage] = useState<{ src: string; date: string } | null>(null);
 
     useEffect(() => {
         const code = localStorage.getItem('family_code');
@@ -24,14 +29,16 @@ export default function ParentPage() {
         const fetchRecords = async (familyCode: string) => {
             const { data, error } = await supabase
                 .from('study_logs')
-                .select('study_date')
-                .eq('family_code', familyCode);
+                .select('study_date, image_url')
+                .eq('family_code', familyCode)
+                .order('study_date', { ascending: false });
 
             if (error) {
                 console.error('Error fetching records:', error);
                 alert('데이터를 불러오는데 실패했어요.');
             } else if (data) {
-                setMarkedDates(data.map(log => log.study_date));
+                setLogs(data);
+                calculateStreak(data);
             }
             setLoading(false);
         };
@@ -39,33 +46,115 @@ export default function ParentPage() {
         fetchRecords(code);
     }, [router]);
 
+    const calculateStreak = (data: { study_date: string }[]) => {
+        if (!data.length) return;
+
+        const uniqueDates = Array.from(new Set(data.map(d => d.study_date))).sort((a, b) => b.localeCompare(a));
+        const today = new Date();
+        const todayStr = format(today, 'yyyy-MM-dd');
+        const yesterdayStr = format(subDays(today, 1), 'yyyy-MM-dd');
+
+        let currentStreak = 0;
+        let checkDate = today;
+
+        // Check if the most recent study was today or yesterday
+        // If the last study was older than yesterday, streak is broken (0)
+        // However, if we are calculating "current streak", we usually include today if done, or yesterday if done.
+
+        // Simpler approach:
+        // 1. Check if today is done. If yes, start checking from today backwards.
+        // 2. If today is NOT done, check if yesterday is done. If yes, start checking from yesterday backwards.
+        // 3. If neither, streak is 0.
+
+        const isTodayDone = uniqueDates.includes(todayStr);
+        const isYesterdayDone = uniqueDates.includes(yesterdayStr);
+
+        let startDateStr = '';
+
+        if (isTodayDone) {
+            startDateStr = todayStr;
+        } else if (isYesterdayDone) {
+            startDateStr = yesterdayStr;
+        } else {
+            setStreak(0);
+            return;
+        }
+
+        currentStreak = 1;
+        checkDate = parseISO(startDateStr);
+
+        // Iterate backwards
+        // (Since dates are sorted desc, we could just iterate the array, but explicit date checking is safer against gaps)
+
+        // Let's use the sorted array approach for efficiency
+        let currentIndex = uniqueDates.indexOf(startDateStr);
+
+        while (currentIndex !== -1 && currentIndex + 1 < uniqueDates.length) {
+            const nextDateStr = uniqueDates[currentIndex + 1];
+            const expectedNextDate = subDays(checkDate, 1);
+            const expectedNextDateStr = format(expectedNextDate, 'yyyy-MM-dd');
+
+            if (nextDateStr === expectedNextDateStr) {
+                currentStreak++;
+                checkDate = expectedNextDate;
+                currentIndex++;
+            } else {
+                break;
+            }
+        }
+
+        setStreak(currentStreak);
+    };
+
+    const handleDateClick = (date: string) => {
+        const log = logs.find(l => l.study_date === date);
+        if (log?.image_url) {
+            setSelectedImage({ src: log.image_url, date });
+        }
+    };
+
     if (loading) return null;
+
+    const markedDates = logs.map(l => l.study_date);
 
     return (
         <main className="flex min-h-screen flex-col items-center p-6 bg-gray-50">
-            <div className="w-full max-w-md space-y-8">
+            <div className="w-full max-w-md space-y-6">
                 <div className="flex items-center justify-between pt-4">
                     <Link href="/" className="text-gray-500 hover:text-gray-900 font-medium">
                         &larr; 메인으로
                     </Link>
                     <h1 className="text-xl font-bold text-gray-900">학습 기록</h1>
-                    <div className="w-16" /> {/* Spacer for centering */}
+                    <div className="w-16" />
                 </div>
 
-                <div className="text-center py-4">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                        이번 달 학습 현황 📅
-                    </h2>
-                    <p className="text-gray-500">
-                        파란색 동그라미가 있는 날은 공부를 완료한 날이에요.
-                    </p>
-                    <p className="text-sm text-toss-blue font-medium bg-blue-50 py-1 px-3 rounded-full inline-block mt-2">
+                <div className="text-center space-y-4">
+                    <div className="inline-block px-4 py-1 bg-white rounded-full shadow-sm border border-gray-100 text-sm text-gray-500 mb-2">
                         가족 암호: {familyCode}
-                    </p>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-toss-blue to-blue-600 rounded-3xl p-6 text-white shadow-xl transform transition-transform hover:scale-[1.02]">
+                        <h2 className="text-lg font-medium opacity-90 mb-1">
+                            현재 연속 공부일 🔥
+                        </h2>
+                        <p className="text-5xl font-extrabold tracking-tight">
+                            {streak}일째
+                        </p>
+                        <p className="text-sm mt-3 opacity-80 font-medium">
+                            {streak > 3 ? '엄청난 꾸준함이에요! 👍' : '시작이 반이에요! 화이팅! 💪'}
+                        </p>
+                    </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                    <Heatmap
+                        logs={logs.map(l => ({ date: l.study_date, hasImage: !!l.image_url }))}
+                        onDateClick={handleDateClick}
+                    />
                 </div>
 
                 <div className="shadow-xl rounded-3xl overflow-hidden bg-white">
-                    <Calendar markedDates={markedDates} />
+                    <Calendar markedDates={markedDates} onDateClick={handleDateClick} />
                 </div>
 
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
@@ -79,12 +168,20 @@ export default function ParentPage() {
                         </div>
                     </div>
                     <Link href="/student">
-                        <button className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200">
+                        <button className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
                             학생 화면 보기
                         </button>
                     </Link>
                 </div>
             </div>
+
+            {selectedImage && (
+                <PhotoModal
+                    src={selectedImage.src}
+                    date={selectedImage.date}
+                    onClose={() => setSelectedImage(null)}
+                />
+            )}
         </main>
     );
 }

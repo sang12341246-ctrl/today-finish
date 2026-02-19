@@ -8,7 +8,7 @@ interface CalendarProps {
     markedDates: string[]; // 'YYYY-MM-DD'
 }
 
-export function Calendar({ currentDate = new Date(), markedDates }: CalendarProps) {
+export function Calendar({ currentDate = new Date(), markedDates, onDateClick }: CalendarProps & { onDateClick?: (date: string) => void }) {
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(currentDate);
     const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
@@ -45,7 +45,11 @@ export function Calendar({ currentDate = new Date(), markedDates }: CalendarProp
                     const isMarked = markedDates.includes(formattedDate);
 
                     return (
-                        <div key={formattedDate} className="aspect-square flex flex-col items-center justify-center relative">
+                        <button
+                            key={formattedDate}
+                            onClick={() => onDateClick?.(formattedDate)}
+                            className="aspect-square flex flex-col items-center justify-center relative hover:bg-gray-50 rounded-lg transition-colors"
+                        >
                             <span className={`z-10 text-sm font-medium ${isMarked ? 'text-white' : 'text-gray-800'}`}>
                                 {format(day, 'd')}
                             </span>
@@ -54,7 +58,7 @@ export function Calendar({ currentDate = new Date(), markedDates }: CalendarProp
                             ) : (
                                 <div className="absolute bottom-2 w-1 h-1 bg-gray-200 rounded-full" />
                             )}
-                        </div>
+                        </button>
                     );
                 })}
             </div>

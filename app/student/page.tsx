@@ -12,6 +12,8 @@ export default function StudentPage() {
     const [isFinished, setIsFinished] = useState(false);
     const [loading, setLoading] = useState(true);
     const [familyCode, setFamilyCode] = useState('');
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
         const code = localStorage.getItem('family_code');
@@ -41,27 +43,65 @@ export default function StudentPage() {
         checkStatus(code);
     }, [router]);
 
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setSelectedFile(e.target.files[0]);
+        }
+    };
+
     const handleFinish = async () => {
         if (isFinished) return;
 
-        // Trigger confetti immediately for better UX
-        triggerConfetti();
-        triggerSimpleConfetti();
-        setIsFinished(true);
+        setUploading(true);
 
-        const today = format(new Date(), 'yyyy-MM-dd');
+        try {
+            let publicUrl = null;
 
-        // Save to Supabase
-        const { error } = await supabase
-            .from('study_logs')
-            .insert([
-                { family_code: familyCode, study_date: today }
-            ]);
+            // 1. Upload Photo if selected
+            if (selectedFile) {
+                const fileExt = selectedFile.name.split('.').pop();
+                // Use English, numeric, and timestamp only for safe storage path
+                const filePath = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
 
-        if (error) {
-            console.error('Error saving log:', error);
-            alert('저장에 실패했어요 ㅠㅠ 다시 시도해주세요.');
-            setIsFinished(false); // Revert optimistic update
+                const { error: uploadError } = await supabase.storage
+                    .from('study-photos')
+                    .upload(filePath, selectedFile);
+
+                if (uploadError) {
+                    throw uploadError;
+                }
+
+                const { data: urlData } = supabase.storage
+                    .from('study-photos')
+                    .getPublicUrl(filePath);
+
+                publicUrl = urlData.publicUrl;
+            }
+
+            // 2. Insert Log
+            const today = format(new Date(), 'yyyy-MM-dd');
+            const { error: dbError } = await supabase
+                .from('study_logs')
+                .insert([
+                    {
+                        family_code: familyCode,
+                        study_date: today,
+                        image_url: publicUrl
+                    }
+                ]);
+
+            if (dbError) throw dbError;
+
+            // 3. Success UI
+            triggerConfetti();
+            triggerSimpleConfetti();
+            setIsFinished(true);
+
+        } catch (error) {
+            console.error('Error:', error);
+            alert('오류가 발생했어요. 다시 시도해주세요.');
+        } finally {
+            setUploading(false);
         }
     };
 
@@ -75,7 +115,7 @@ export default function StudentPage() {
                 </Link>
             </div>
 
-            <div className="flex flex-col items-center gap-12 animate-in zoom-in duration-300">
+            <div className="flex flex-col items-center gap-12 animate-in zoom-in duration-300 w-full max-w-sm">
                 <div className="text-center space-y-2">
                     <h1 className="text-3xl font-bold text-gray-900">
                         {isFinished ? "수고했어요! 🎉" : "오늘 공부 끝?"}
@@ -90,18 +130,51 @@ export default function StudentPage() {
                     </p>
                 </div>
 
+                {!isFinished && (
+                    <div className="w-full">
+                        <label
+                            htmlFor="photo-upload"
+                            className={`
+                                block w-full p-4 border-2 border-dashed rounded-xl text-center cursor-pointer transition-colors
+                                ${selectedFile ? 'border-toss-blue bg-blue-50 text-toss-blue' : 'border-gray-300 hover:border-gray-400 text-gray-500'}
+                            `}
+                        >
+                            {selectedFile ? (
+                                <span className="font-medium truncate block">📸 {selectedFile.name}</span>
+                            ) : (
+                                <span>📸 사진 첨부하기 (선택)</span>
+                            )}
+                            <input
+                                id="photo-upload"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileChange}
+                                className="hidden"
+                            />
+                        </label>
+                    </div>
+                )}
+
                 <button
                     onClick={handleFinish}
-                    disabled={isFinished}
+                    disabled={isFinished || uploading}
                     className={`
             w-64 h-64 rounded-full text-3xl font-bold shadow-2xl transition-all duration-300 transform
-            flex items-center justify-center
+            flex flex-col items-center justify-center gap-2
             ${isFinished
                             ? 'bg-gray-100 text-gray-400 cursor-not-allowed scale-95'
                             : 'bg-toss-blue text-white hover:bg-toss-blue-hover hover:scale-105 active:scale-95 shadow-blue-500/40 ring-4 ring-blue-100'}
+            ${uploading ? 'cursor-wait opacity-80' : ''}
           `}
                 >
-                    {isFinished ? "완료됨" : "오늘 공부 끝!"}
+                    {uploading ? (
+                        <>
+                            <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin mb-2" />
+                            <span className="text-lg">사진 올리는 중...</span>
+                        </>
+                    ) : (
+                        isFinished ? "완료됨" : "오늘 공부 끝!"
+                    )}
                 </button>
 
                 {isFinished && (
