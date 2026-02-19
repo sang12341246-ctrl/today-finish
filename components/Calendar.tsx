@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, getDay } from 'date-fns';
+
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay } from 'date-fns';
 
 interface CalendarProps {
     currentDate?: Date;

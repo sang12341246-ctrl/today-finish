@@ -21,24 +21,25 @@ export default function StudentPage() {
             return;
         }
         setFamilyCode(code);
+
+        const checkStatus = async (familyCode: string) => {
+            const today = format(new Date(), 'yyyy-MM-dd');
+
+            const { data } = await supabase
+                .from('study_logs')
+                .select('*')
+                .eq('family_code', familyCode)
+                .eq('study_date', today)
+                .single();
+
+            if (data) {
+                setIsFinished(true);
+            }
+            setLoading(false);
+        };
+
         checkStatus(code);
-    }, []);
-
-    const checkStatus = async (code: string) => {
-        const today = format(new Date(), 'yyyy-MM-dd');
-
-        const { data } = await supabase
-            .from('study_logs')
-            .select('*')
-            .eq('family_code', code)
-            .eq('study_date', today)
-            .single();
-
-        if (data) {
-            setIsFinished(true);
-        }
-        setLoading(false);
-    };
+    }, [router]);
 
     const handleFinish = async () => {
         if (isFinished) return;

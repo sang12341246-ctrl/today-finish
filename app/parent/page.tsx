@@ -20,23 +20,24 @@ export default function ParentPage() {
             return;
         }
         setFamilyCode(code);
+
+        const fetchRecords = async (familyCode: string) => {
+            const { data, error } = await supabase
+                .from('study_logs')
+                .select('study_date')
+                .eq('family_code', familyCode);
+
+            if (error) {
+                console.error('Error fetching records:', error);
+                alert('데이터를 불러오는데 실패했어요.');
+            } else if (data) {
+                setMarkedDates(data.map(log => log.study_date));
+            }
+            setLoading(false);
+        };
+
         fetchRecords(code);
-    }, []);
-
-    const fetchRecords = async (code: string) => {
-        const { data, error } = await supabase
-            .from('study_logs')
-            .select('study_date')
-            .eq('family_code', code);
-
-        if (error) {
-            console.error('Error fetching records:', error);
-            alert('데이터를 불러오는데 실패했어요.');
-        } else if (data) {
-            setMarkedDates(data.map(log => log.study_date));
-        }
-        setLoading(false);
-    };
+    }, [router]);
 
     if (loading) return null;
 
