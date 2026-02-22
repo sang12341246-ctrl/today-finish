@@ -53,54 +53,42 @@ export default function RoleSelectPage() {
                     <div className="inline-block px-4 py-1.5 bg-blue-50 text-toss-blue font-bold rounded-full mb-2">
                         {groupName} 단체방
                     </div>
-                    <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">
-                        누구신가요?
+                    <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 leading-tight">
+                        학생 이름을 입력해주세요 📛
                     </h1>
                 </div>
 
                 {/* Name Input for Students */}
-                <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 text-left space-y-2">
-                    <label htmlFor="studentName" className="font-bold text-gray-700 ml-1">
-                        이름 (학생용) 📛
-                    </label>
-                    <input
-                        id="studentName"
-                        type="text"
-                        value={studentName}
-                        onChange={(e) => setStudentName(e.target.value)}
-                        placeholder="예: 홍길동"
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-toss-blue focus:ring-2 focus:ring-blue-100 outline-none transition-all text-lg font-medium"
-                    />
-                    <p className="text-xs text-gray-400 ml-1">
-                        학생이라면 실명이나 활동명을 꼭 남겨주세요!
-                    </p>
-                </div>
+                <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 text-left space-y-4">
+                    <div className="space-y-2">
+                        <label htmlFor="studentName" className="font-bold text-gray-700 ml-1">
+                            보낼 사람 이름
+                        </label>
+                        <input
+                            id="studentName"
+                            type="text"
+                            value={studentName}
+                            onChange={(e) => setStudentName(e.target.value)}
+                            placeholder="예: 홍길동"
+                            className="w-full px-4 py-4 rounded-2xl border border-gray-200 focus:border-toss-blue focus:ring-2 focus:ring-blue-100 outline-none transition-all text-lg font-medium bg-gray-50"
+                        />
+                        <p className="text-xs text-gray-400 ml-1">
+                            선생님께 보여질 이름이니 실명을 권장해요!
+                        </p>
+                    </div>
 
-                <div className="flex flex-col gap-4 w-full">
                     <button
                         onClick={handleStudentClick}
-                        className="flex items-center justify-between p-6 bg-white rounded-3xl shadow-sm hover:shadow-md border border-gray-100 transition-all group"
+                        className="w-full py-4 bg-blue-600 text-white rounded-2xl text-lg font-bold shadow-sm transition-all hover:bg-blue-700 active:scale-[0.98] mt-2"
                     >
-                        <div className="text-left">
-                            <h2 className="text-2xl font-bold text-gray-800 mb-1 group-hover:text-toss-blue transition-colors">학생 👨‍🎓</h2>
-                            <p className="text-sm text-gray-500 font-medium">숙제 사진 여러 장을 올릴래요</p>
-                        </div>
-                        <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center group-hover:bg-blue-50 transition-colors">
-                            <span className="text-xl">📸</span>
-                        </div>
+                        입장하기 📸
                     </button>
 
                     <button
-                        onClick={handleTeacherClick}
-                        className="flex items-center justify-between p-6 bg-white rounded-3xl shadow-sm hover:shadow-md border border-gray-100 transition-all group"
+                        onClick={() => router.push('/group')}
+                        className="w-full py-3 text-gray-400 text-sm font-medium hover:text-gray-600 transition-colors"
                     >
-                        <div className="text-left">
-                            <h2 className="text-2xl font-bold text-gray-800 mb-1 group-hover:text-toss-blue transition-colors">선생님 👩‍🏫</h2>
-                            <p className="text-sm text-gray-500 font-medium">우리 반 숙제 현황을 확인할래요</p>
-                        </div>
-                        <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center group-hover:bg-blue-50 transition-colors">
-                            <span className="text-xl">📊</span>
-                        </div>
+                        다시 선택하기
                     </button>
                 </div>
             </div>

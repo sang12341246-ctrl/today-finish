@@ -2,50 +2,79 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 
 export default function GroupPasswordPage() {
     const router = useRouter();
     const [password, setPassword] = useState('');
 
-    const handleConfirm = () => {
+    const handleTeacherRole = () => {
         if (password === 'test') {
+            localStorage.setItem('premium_group_id', 'test-group');
+            localStorage.setItem('premium_group_name', '우리 반');
+            router.push('/group/teacher');
+        } else {
+            alert('잘못된 비밀번호입니다. 🔒');
+        }
+    };
+
+    const handleStudentRole = () => {
+        if (password === 'test') {
+            localStorage.setItem('premium_group_id', 'test-group');
+            localStorage.setItem('premium_group_name', '우리 반');
             router.push('/group/role-select');
         } else {
-            alert('잘못된 비밀번호입니다.');
+            alert('잘못된 비밀번호입니다. 🔒');
         }
     };
 
     return (
         <main className="flex min-h-screen flex-col items-center justify-center p-6 bg-gray-50">
+            <div className="absolute top-6 left-6">
+                <Link href="/" className="text-gray-500 hover:text-gray-900 font-medium hover:-translate-x-1 transition-transform">
+                    &larr; 메인으로
+                </Link>
+            </div>
+
             <div className="text-center w-full max-w-md space-y-8 bg-white p-8 rounded-3xl shadow-sm border border-gray-100 animate-in fade-in zoom-in duration-500">
-                <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">
-                    단체방 입장
-                </h1>
+                <div className="space-y-2">
+                    <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 leading-tight">
+                        단체방 입장
+                    </h1>
+                    <p className="text-gray-500 font-medium">우리 단체방 암호를 입력해주세요.</p>
+                </div>
 
                 <div className="space-y-4 text-left">
                     <label htmlFor="password" className="text-sm font-bold text-gray-700 ml-1">
-                        비밀번호 입력칸 🔒
+                        단체방 암호 🔑
                     </label>
                     <input
                         id="password"
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        placeholder="비밀번호를 입력하세요"
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-toss-blue focus:ring-2 focus:ring-blue-100 outline-none transition-all text-lg font-medium bg-gray-50 mb-4"
+                        placeholder="예: hello1234"
+                        className="w-full px-4 py-4 rounded-2xl border border-gray-200 focus:border-toss-blue focus:ring-2 focus:ring-blue-100 outline-none transition-all text-lg font-medium bg-gray-50"
                         onKeyDown={(e) => {
-                            if (e.key === 'Enter') handleConfirm();
+                            if (e.key === 'Enter') handleStudentRole();
                         }}
                     />
-                    <Button
-                        onClick={handleConfirm}
-                        variant="primary"
-                        fullWidth
-                        className="text-xl py-6 rounded-3xl shadow-lg shadow-blue-500/20"
+                </div>
+
+                <div className="flex flex-col gap-3 pt-2">
+                    <button
+                        onClick={handleStudentRole}
+                        className="w-full py-4 bg-blue-600 text-white rounded-2xl text-lg font-bold shadow-sm transition-all hover:bg-blue-700 active:scale-[0.98]"
                     >
-                        확인
-                    </Button>
+                        학생 입장 👨‍🎓
+                    </button>
+                    <button
+                        onClick={handleTeacherRole}
+                        className="w-full py-4 bg-gray-100 text-gray-700 rounded-2xl text-lg font-bold shadow-sm transition-all hover:bg-gray-200 active:scale-[0.98]"
+                    >
+                        선생님 입장 👩‍🏫
+                    </button>
                 </div>
             </div>
         </main>
