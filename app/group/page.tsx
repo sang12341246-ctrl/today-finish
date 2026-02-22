@@ -10,7 +10,7 @@ export default function GroupPasswordPage() {
 
     const handleConfirm = () => {
         if (password === 'test') {
-            router.push('/group/role');
+            router.push('/group/role-select');
         } else {
             alert('잘못된 비밀번호입니다.');
         }
