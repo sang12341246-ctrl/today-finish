@@ -100,7 +100,7 @@ export default function Home() {
             href="/premium"
             className="text-xs font-semibold text-gray-400 hover:text-gray-600 underline underline-offset-2 transition-colors"
           >
-            프리미엄 결제하기? 💳
+            프리미엄 결제하기 💳
           </Link>
         </div>
 
