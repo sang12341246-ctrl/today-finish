@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function Home() {
   const [familyKey, setFamilyKey] = useState("");
@@ -17,13 +18,13 @@ export default function Home() {
   });
 
   const handleStudentEntry = () => {
-    if (!familyKey) return alert("가족 암호를 입력해주세요!");
+    if (!familyKey) return toast.error("가족 암호를 입력해주세요!");
     localStorage.setItem("family_code", familyKey);
     router.push("/student");
   };
 
   const handleParentEntry = () => {
-    if (!familyKey) return alert("가족 암호를 입력해주세요!");
+    if (!familyKey) return toast.error("가족 암호를 입력해주세요!");
     localStorage.setItem("family_code", familyKey);
     router.push("/parent");
   };

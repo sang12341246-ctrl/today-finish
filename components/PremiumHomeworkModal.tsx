@@ -116,7 +116,7 @@ export function PremiumHomeworkModal({ homework, onClose }: PremiumHomeworkModal
                             </div>
 
                             {/* Teacher Feedback Component */}
-                            <TeacherFeedback homeworkId={homework.id} />
+                            <TeacherFeedback homeworkId={homework.id} onClose={onClose} />
                         </div>
                     </div>
                 </div>

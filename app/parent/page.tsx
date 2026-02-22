@@ -8,6 +8,7 @@ import { Calendar } from '@/components/Calendar';
 import { Heatmap } from '@/components/Heatmap';
 import { PhotoModal } from '@/components/PhotoModal';
 import { supabase } from '@/lib/supabase';
+import toast from 'react-hot-toast';
 
 export default function ParentPage() {
     const router = useRouter();
@@ -20,7 +21,7 @@ export default function ParentPage() {
     useEffect(() => {
         const code = localStorage.getItem('family_code');
         if (!code) {
-            alert('가족 암호가 필요해요!');
+            toast.error('가족 암호가 필요해요!');
             router.push('/');
             return;
         }
@@ -35,7 +36,7 @@ export default function ParentPage() {
 
             if (error) {
                 console.error('Error fetching records:', error);
-                alert('데이터를 불러오는데 실패했어요.');
+                toast.error('데이터를 불러오는데 실패했어요.');
             } else if (data) {
                 setLogs(data);
                 calculateStreak(data);

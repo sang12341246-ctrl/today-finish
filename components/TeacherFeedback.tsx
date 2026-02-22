@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import toast from 'react-hot-toast';
 
 interface Feedback {
     id: string;
@@ -12,6 +13,7 @@ interface Feedback {
 
 interface TeacherFeedbackProps {
     homeworkId: string;
+    onClose?: () => void;
 }
 
 const REACTION_TYPES = [
@@ -21,13 +23,25 @@ const REACTION_TYPES = [
     { type: 'check', emoji: '✅', label: '확인완료' },
 ];
 
-export function TeacherFeedback({ homeworkId }: TeacherFeedbackProps) {
+export function TeacherFeedback({ homeworkId, onClose }: TeacherFeedbackProps) {
     const [comment, setComment] = useState('');
     const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
     const [loading, setLoading] = useState(false);
     const [selectedReaction, setSelectedReaction] = useState<string | null>(null);
+    const [showStamp, setShowStamp] = useState(false);
+    const [stampEmoji, setStampEmoji] = useState<string | null>(null);
 
     useEffect(() => {
+        async function fetchFeedbacks() {
+            const { data, error } = await supabase
+                .from('premium_feedback')
+                .select('*')
+                .eq('homework_id', homeworkId)
+                .order('created_at', { ascending: true });
+
+            if (data) setFeedbacks(data);
+        }
+
         fetchFeedbacks();
 
         // Subscribe to feedback changes
@@ -50,16 +64,6 @@ export function TeacherFeedback({ homeworkId }: TeacherFeedbackProps) {
         };
     }, [homeworkId]);
 
-    async function fetchFeedbacks() {
-        const { data, error } = await supabase
-            .from('premium_feedback')
-            .select('*')
-            .eq('homework_id', homeworkId)
-            .order('created_at', { ascending: true });
-
-        if (data) setFeedbacks(data);
-    };
-
     const handleSubmit = async (reactionType?: string) => {
         if (!comment.trim() && !reactionType) return;
 
@@ -75,8 +79,20 @@ export function TeacherFeedback({ homeworkId }: TeacherFeedbackProps) {
         if (!error) {
             setComment('');
             setSelectedReaction(null);
+
+            const rType = reactionType || selectedReaction;
+            const emoji = REACTION_TYPES.find(r => r.type === rType)?.emoji || '✅';
+            setStampEmoji(emoji);
+            setShowStamp(true);
+            toast.success('피드백을 성공적으로 남겼습니다! 🎉');
+
+            setTimeout(() => {
+                setShowStamp(false);
+                if (onClose) onClose();
+            }, 1000); // 1초 후 자동 닫기
+
         } else {
-            alert('피드백 저장 중 오류가 발생했습니다.');
+            toast.error('피드백 저장 중 오류가 발생했습니다.');
         }
         setLoading(false);
     };
@@ -146,6 +162,21 @@ export function TeacherFeedback({ homeworkId }: TeacherFeedbackProps) {
                             </div>
                         </div>
                     ))}
+                </div>
+            )}
+
+            {/* Stamp Animation Overlay */}
+            {showStamp && (
+                <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none overflow-hidden">
+                    <div className="absolute inset-0 bg-white/20 backdrop-blur-[2px] animate-in fade-in duration-300"></div>
+                    <div className="relative animate-in zoom-in spin-in-12 duration-500 flex flex-col items-center">
+                        <span className="text-9xl drop-shadow-2xl translate-y-4">
+                            {stampEmoji}
+                        </span>
+                        <div className="text-3xl font-black text-rose-500 -rotate-12 border-4 border-rose-500 p-2 rounded-xl bg-white/60 backdrop-blur-sm -translate-y-8 shadow-xl">
+                            참 잘했어요!
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
