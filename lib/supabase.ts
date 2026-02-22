@@ -1,7 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 
-// TODO: Replace with environment variables in production
-const supabaseUrl = 'https://cycolwzqysboqhbagshr.supabase.co';
-const supabaseKey = 'sb_publishable_NUJ1EzUIQ9I-H_I5ZHE6CQ_S3nqVddK';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 export const supabase = createClient(supabaseUrl, supabaseKey);

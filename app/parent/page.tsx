@@ -117,6 +117,16 @@ export default function ParentPage() {
 
     const markedDates = logs.map(l => l.study_date);
 
+    const getStreakMessage = (current: number) => {
+        if (current === 0) return '오늘부터 바로 시작해볼까요? 🚀';
+        if (current === 1) return '시작이 반이에요! 화이팅! 💪';
+        if (current === 2) return '이틀 연속! 훌륭해요! ✨';
+        if (current === 3) return '작심삼일 극복! 대단해요! 🎉';
+        if (current < 7) return '꾸준함의 힘을 믿어요! 👍';
+        if (current < 30) return '완벽한 습관이 되었네요! 🔥';
+        return '전설적인 꾸준함입니다! 👑';
+    };
+
     return (
         <main className="flex min-h-screen flex-col items-center p-6 bg-gray-50">
             <div className="w-full max-w-md space-y-6">
@@ -125,7 +135,17 @@ export default function ParentPage() {
                         &larr; 메인으로
                     </Link>
                     <h1 className="text-xl font-bold text-gray-900">학습 기록</h1>
-                    <div className="w-16" />
+                    <button
+                        onClick={() => {
+                            if (confirm('가족 암호를 초기화하고 로그아웃 하시겠습니까?')) {
+                                localStorage.removeItem('family_code');
+                                router.push('/');
+                            }
+                        }}
+                        className="text-gray-400 hover:text-red-500 text-sm font-medium transition-colors"
+                    >
+                        암호 초기화 🔄
+                    </button>
                 </div>
 
                 <div className="text-center space-y-4">
@@ -141,7 +161,7 @@ export default function ParentPage() {
                             {streak}일째
                         </p>
                         <p className="text-sm mt-3 opacity-80 font-medium">
-                            {streak > 3 ? '엄청난 꾸준함이에요! 👍' : '시작이 반이에요! 화이팅! 💪'}
+                            {getStreakMessage(streak)}
                         </p>
                     </div>
                 </div>
@@ -153,8 +173,38 @@ export default function ParentPage() {
                     />
                 </div>
 
+                {/* Recent Photo Section */}
+                {logs.find(l => l.image_url) && (
+                    <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 space-y-3">
+                        <div className="flex items-center justify-between">
+                            <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                                📸 최근 인증 사진
+                            </h3>
+                            <span className="text-xs text-gray-400">
+                                {logs.find(l => l.image_url)?.study_date}
+                            </span>
+                        </div>
+                        <div
+                            className="relative aspect-video w-full bg-gray-50 rounded-2xl overflow-hidden cursor-pointer hover:opacity-95 transition-opacity border border-gray-50"
+                            onClick={() => {
+                                const latest = logs.find(l => l.image_url);
+                                if (latest?.image_url) {
+                                    setSelectedImage({ src: latest.image_url, date: latest.study_date });
+                                }
+                            }}
+                        >
+                            <img
+                                src={logs.find(l => l.image_url)?.image_url!}
+                                alt="공부 인증 사진"
+                                className="object-cover w-full h-full"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                        </div>
+                    </div>
+                )}
+
                 <div className="shadow-xl rounded-3xl overflow-hidden bg-white">
-                    <Calendar markedDates={markedDates} onDateClick={handleDateClick} />
+                    <Calendar markedDates={markedDates} logs={logs} onDateClick={handleDateClick} />
                 </div>
 
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">

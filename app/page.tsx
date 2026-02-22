@@ -2,12 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
+import { supabase } from '@/lib/supabase';
 
 export default function Home() {
   const router = useRouter();
   const [familyCode, setFamilyCode] = useState('');
   const [savedCode, setSavedCode] = useState('');
+
 
   useEffect(() => {
     const saved = localStorage.getItem('family_code');
@@ -25,6 +28,7 @@ export default function Home() {
     localStorage.setItem('family_code', familyCode.trim());
     router.push(path);
   };
+
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-6 bg-gray-50">
@@ -79,6 +83,19 @@ export default function Home() {
           >
             부모님 입장 👨‍👩‍👧‍👦
           </Button>
+        </div>
+
+        {/* Premium Group Section */}
+        <div className="mt-8 px-4">
+          <Link href="/group">
+            <Button
+              variant="outline"
+              fullWidth
+              className="text-lg py-5 rounded-3xl border-2 border-yellow-400 text-yellow-600 hover:bg-yellow-50 bg-white shadow-sm flex items-center justify-center gap-2 font-bold"
+            >
+              👑 프리미엄 단체방 입장
+            </Button>
+          </Link>
         </div>
 
       </div>

@@ -6,9 +6,10 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay } from 'dat
 interface CalendarProps {
     currentDate?: Date;
     markedDates: string[]; // 'YYYY-MM-DD'
+    logs?: { study_date: string; image_url: string | null }[];
 }
 
-export function Calendar({ currentDate = new Date(), markedDates, onDateClick }: CalendarProps & { onDateClick?: (date: string) => void }) {
+export function Calendar({ currentDate = new Date(), markedDates, logs, onDateClick }: CalendarProps & { onDateClick?: (date: string) => void }) {
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(currentDate);
     const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
@@ -42,7 +43,9 @@ export function Calendar({ currentDate = new Date(), markedDates, onDateClick }:
                 ))}
                 {daysInMonth.map((day) => {
                     const formattedDate = format(day, 'yyyy-MM-dd');
+                    const log = logs?.find(l => l.study_date === formattedDate);
                     const isMarked = markedDates.includes(formattedDate);
+                    const hasImage = !!log?.image_url;
 
                     return (
                         <button
@@ -57,6 +60,11 @@ export function Calendar({ currentDate = new Date(), markedDates, onDateClick }:
                                 <div className="absolute inset-0 m-1 bg-toss-blue rounded-full" />
                             ) : (
                                 <div className="absolute bottom-2 w-1 h-1 bg-gray-200 rounded-full" />
+                            )}
+                            {hasImage && (
+                                <div className="absolute -top-1 -right-1 z-20 bg-white rounded-full shadow-sm p-0.5 border border-gray-100 animate-in fade-in zoom-in duration-300">
+                                    <span className="text-[10px]">📸</span>
+                                </div>
                             )}
                         </button>
                     );
