@@ -10,23 +10,23 @@ export default function GroupPasswordPage() {
     const [password, setPassword] = useState('');
 
     const handleTeacherRole = () => {
-        if (password === 'test') {
-            localStorage.setItem('premium_group_id', 'test-group');
-            localStorage.setItem('premium_group_name', '우리 반');
-            router.push('/group/teacher');
-        } else {
-            alert('잘못된 비밀번호입니다. 🔒');
+        if (password.trim().length < 2) {
+            alert('단체방 이름을 2글자 이상 입력해주세요! 🔒');
+            return;
         }
+        localStorage.setItem('premium_group_id', password.trim());
+        localStorage.setItem('premium_group_name', password.trim());
+        router.push('/group/teacher');
     };
 
     const handleStudentRole = () => {
-        if (password === 'test') {
-            localStorage.setItem('premium_group_id', 'test-group');
-            localStorage.setItem('premium_group_name', '우리 반');
-            router.push('/group/role-select');
-        } else {
-            alert('잘못된 비밀번호입니다. 🔒');
+        if (password.trim().length < 2) {
+            alert('단체방 이름을 2글자 이상 입력해주세요! 🔒');
+            return;
         }
+        localStorage.setItem('premium_group_id', password.trim());
+        localStorage.setItem('premium_group_name', password.trim());
+        router.push('/group/role-select');
     };
 
     return (
@@ -42,12 +42,12 @@ export default function GroupPasswordPage() {
                     <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 leading-tight">
                         단체방 입장
                     </h1>
-                    <p className="text-gray-500 font-medium">우리 단체방 암호를 입력해주세요.</p>
+                    <p className="text-gray-500 font-medium">우리 단체방 이름(또는 암호)을 입력해주세요.</p>
                 </div>
 
                 <div className="space-y-4 text-left">
                     <label htmlFor="password" className="text-sm font-bold text-gray-700 ml-1">
-                        단체방 암호 🔑
+                        단체방 이름 (고유 암호) 🔑
                     </label>
                     <input
                         id="password"
