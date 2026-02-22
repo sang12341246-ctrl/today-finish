@@ -46,7 +46,7 @@ export default function ParentPage() {
         fetchRecords(code);
     }, [router]);
 
-    const calculateStreak = (data: { study_date: string }[]) => {
+    function calculateStreak(data: { study_date: string }[]) {
         if (!data.length) return;
 
         const uniqueDates = Array.from(new Set(data.map(d => d.study_date))).sort((a, b) => b.localeCompare(a));
@@ -194,7 +194,7 @@ export default function ParentPage() {
                             }}
                         >
                             <img
-                                src={logs.find(l => l.image_url)?.image_url!}
+                                src={logs.find(l => l.image_url)?.image_url || ''}
                                 alt="공부 인증 사진"
                                 className="object-cover w-full h-full"
                             />

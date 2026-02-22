@@ -19,12 +19,14 @@ export default function RoleSelectPage() {
             return;
         }
 
-        if (name) {
-            setGroupName(name);
-        }
-        if (savedStudentName) {
-            setStudentName(savedStudentName);
-        }
+        setTimeout(() => {
+            if (name) {
+                setGroupName(name);
+            }
+            if (savedStudentName) {
+                setStudentName(savedStudentName);
+            }
+        }, 0);
     }, [router]);
 
     const handleStudentClick = () => {

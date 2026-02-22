@@ -53,7 +53,7 @@ export default function StudentPage() {
                 }
 
                 if (currentStreak > 0) {
-                    let checkDateStr = format(tDate, 'yyyy-MM-dd');
+                    const checkDateStr = format(tDate, 'yyyy-MM-dd');
                     let currentIndex = uniqueDates.indexOf(checkDateStr);
 
                     while (currentIndex !== -1 && currentIndex + 1 < uniqueDates.length) {

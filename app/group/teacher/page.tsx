@@ -30,8 +30,10 @@ export default function PremiumTeacherPage() {
             return;
         }
 
-        setGroupId(id);
-        setGroupName(gName || '');
+        setTimeout(() => {
+            setGroupId(id);
+            setGroupName(gName || '');
+        }, 0);
 
         const fetchHomeworks = async () => {
             const today = new Date();

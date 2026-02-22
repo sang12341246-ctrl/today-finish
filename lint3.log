@@ -1,0 +1,154 @@
+
+C:\Users\sang1\OneDrive\바탕 화면\엄전끝\.agent\skills\react-components\examples\gold-standard-card.tsx
+  20:10  warning  'cardData' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\sang1\OneDrive\바탕 화면\엄전끝\.agent\skills\remotion\examples\WalkthroughComposition.tsx
+   2:9   warning  'Sequence' is defined but never used         @typescript-eslint/no-unused-vars
+  19:15  warning  'width' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  19:22  warning  'height' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\sang1\OneDrive\바탕 화면\엄전끝\.agent\skills\remotion\resources\screen-slide-template.tsx
+  16:3  warning  'width' is defined but never used   @typescript-eslint/no-unused-vars
+  17:3  warning  'height' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\sang1\OneDrive\바탕 화면\엄전끝\.agent\skills\shadcn-ui\examples\data-table.tsx
+  157:17  warning  Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+C:\Users\sang1\OneDrive\바탕 화면\엄전끝\.agent\skills\shadcn-ui\examples\data-table.tsx:157:17
+  155 |   const [rowSelection, setRowSelection] = React.useState({})
+  156 |
+> 157 |   const table = useReactTable({
+      |                 ^^^^^^^^^^^^^ TanStack Table's `useReactTable()` API returns functions that cannot be memoized safely
+  158 |     data,
+  159 |     columns,
+  160 |     onSortingChange: setSorting,  react-hooks/incompatible-library
+
+C:\Users\sang1\OneDrive\바탕 화면\엄전끝\app\group\page.tsx
+  6:10  warning  'Button' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\sang1\OneDrive\바탕 화면\엄전끝\app\group\role-select\page.tsx
+  41:11  warning  'handleTeacherClick' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\sang1\OneDrive\바탕 화면\엄전끝\app\group\student\page.tsx
+  353:41  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  374:41  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\sang1\OneDrive\바탕 화면\엄전끝\app\group\teacher\page.tsx
+  19:12  warning  'groupId' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   @typescript-eslint/no-unused-vars
+  33:9   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\sang1\OneDrive\바탕 화면\엄전끝\app\group\teacher\page.tsx:33:9
+  31 |         }
+  32 |
+> 33 |         setGroupId(id);
+     |         ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  34 |         setGroupName(gName || '');
+  35 |
+  36 |         const fetchHomeworks = async () => {  react-hooks/set-state-in-effect
+
+C:\Users\sang1\OneDrive\바탕 화면\엄전끝\app\parent\page.tsx
+   41:17  error    Error: Cannot access variable before it is declared
+
+`calculateStreak` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Users\sang1\OneDrive\바탕 화면\엄전끝\app\parent\page.tsx:41:17
+  39 |             } else if (data) {
+  40 |                 setLogs(data);
+> 41 |                 calculateStreak(data);
+     |                 ^^^^^^^^^^^^^^^ `calculateStreak` accessed before it is declared
+  42 |             }
+  43 |             setLoading(false);
+  44 |         };
+
+C:\Users\sang1\OneDrive\바탕 화면\엄전끝\app\parent\page.tsx:49:5
+   47 |     }, [router]);
+   48 |
+>  49 |     function calculateStreak(data: { study_date: string }[]) {
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  50 |         if (!data.length) return;
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  51 |
+      …
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 106 |         setStreak(currentStreak);
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 107 |     };
+      | ^^^^^^ `calculateStreak` is declared here
+  108 |
+  109 |     const handleDateClick = (date: string) => {
+  110 |         const log = logs.find(l => l.study_date === date);  react-hooks/immutability
+  196:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     @next/next/no-img-element
+  197:38  error    Optional chain expressions can return undefined by design - using a non-null assertion is unsafe and wrong                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  @typescript-eslint/no-non-null-asserted-optional-chain
+
+C:\Users\sang1\OneDrive\바탕 화면\엄전끝\app\premium\page.tsx
+   3:29  warning  'useState' is defined but never used         @typescript-eslint/no-unused-vars
+  13:11  warning  'router' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\sang1\OneDrive\바탕 화면\엄전끝\app\student\page.tsx
+  56:25  error  'checkDateStr' is never reassigned. Use 'const' instead  prefer-const
+
+C:\Users\sang1\OneDrive\바탕 화면\엄전끝\app\success\page.tsx
+  3:10  warning  'useEffect' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\sang1\OneDrive\바탕 화면\엄전끝\components\PremiumHomeworkModal.tsx
+   66:33  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  102:45  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\sang1\OneDrive\바탕 화면\엄전끝\components\TeacherDashboardGrid.tsx
+  93:37  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\sang1\OneDrive\바탕 화면\엄전끝\components\TeacherFeedback.tsx
+  31:9   error    Error: Cannot access variable before it is declared
+
+`fetchFeedbacks` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Users\sang1\OneDrive\바탕 화면\엄전끝\components\TeacherFeedback.tsx:31:9
+  29 |
+  30 |     useEffect(() => {
+> 31 |         fetchFeedbacks();
+     |         ^^^^^^^^^^^^^^ `fetchFeedbacks` accessed before it is declared
+  32 |
+  33 |         // Subscribe to feedback changes
+  34 |         const channel = supabase
+
+C:\Users\sang1\OneDrive\바탕 화면\엄전끝\components\TeacherFeedback.tsx:53:5
+  51 |     }, [homeworkId]);
+  52 |
+> 53 |     async function fetchFeedbacks() {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 54 |         const { data, error } = await supabase
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 55 |             .from('premium_feedback')
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 56 |             .select('*')
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 57 |             .eq('homework_id', homeworkId)
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 58 |             .order('created_at', { ascending: true });
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 59 |
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 60 |         if (data) setFeedbacks(data);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 61 |     };
+     | ^^^^^^ `fetchFeedbacks` is declared here
+  62 |
+  63 |     const handleSubmit = async (reactionType?: string) => {
+  64 |         if (!comment.trim() && !reactionType) return;  react-hooks/immutability
+  51:8   warning  React Hook useEffect has a missing dependency: 'fetchFeedbacks'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                react-hooks/exhaustive-deps
+  54:23  warning  'error' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+
+C:\Users\sang1\OneDrive\바탕 화면\엄전끝\seed_test_data.js
+  1:1  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+✖ 27 problems (6 errors, 21 warnings)
+  1 error and 0 warnings potentially fixable with the `--fix` option.
+

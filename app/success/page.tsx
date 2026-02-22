@@ -89,7 +89,7 @@ export default function SuccessPage() {
                             disabled={isCreating}
                         />
                         <p className="text-xs text-gray-400 mt-2 ml-1">
-                            * 이 비밀번호를 학생들에게 알려주시면, 앱 메인에서 '단체 코드로 입장하기'를 통해 접속할 수 있습니다.
+                            * 이 비밀번호를 학생들에게 알려주시면, 앱 메인에서 &apos;단체 코드로 입장하기&apos;를 통해 접속할 수 있습니다.
                         </p>
                     </div>
 

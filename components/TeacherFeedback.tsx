@@ -50,7 +50,7 @@ export function TeacherFeedback({ homeworkId }: TeacherFeedbackProps) {
         };
     }, [homeworkId]);
 
-    const fetchFeedbacks = async () => {
+    async function fetchFeedbacks() {
         const { data, error } = await supabase
             .from('premium_feedback')
             .select('*')

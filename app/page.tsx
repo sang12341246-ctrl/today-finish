@@ -78,4 +78,4 @@ export default function Home() {
       </div>
     </div>
   );
-}//// Vercel 제발 일어나서 일해라!!!
+}
