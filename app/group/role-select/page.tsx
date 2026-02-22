@@ -50,8 +50,8 @@ export default function RoleSelectPage() {
 
             <div className="text-center max-w-md w-full space-y-10 animate-in fade-in zoom-in duration-500">
                 <div className="space-y-4">
-                    <div className="inline-block px-4 py-1.5 bg-blue-100 text-toss-blue font-bold rounded-full mb-2">
-                        {groupName} 단체 접속
+                    <div className="inline-block px-4 py-1.5 bg-blue-50 text-toss-blue font-bold rounded-full mb-2">
+                        {groupName} 단체방
                     </div>
                     <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">
                         누구신가요?

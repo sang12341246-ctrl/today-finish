@@ -20,7 +20,7 @@ export default function GroupPasswordPage() {
         <main className="flex min-h-screen flex-col items-center justify-center p-6 bg-gray-50">
             <div className="text-center w-full max-w-md space-y-8 bg-white p-8 rounded-3xl shadow-sm border border-gray-100 animate-in fade-in zoom-in duration-500">
                 <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">
-                    프리미엄 단체방 입장
+                    단체방 입장
                 </h1>
 
                 <div className="space-y-4 text-left">

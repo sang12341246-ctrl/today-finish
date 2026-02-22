@@ -66,13 +66,13 @@ export default function Home() {
           부모님 입장 👨‍👩‍👧‍👦
         </button>
 
-        {/* 새로 추가된 무료 단체방 입장 버튼 */}
+        {/* 단체방 입장 버튼 (무료/프리미엄 텍스트 제거) */}
         <div className="w-full border-t border-gray-200 pt-6 flex flex-col items-center">
           <Link
             href="/group"
-            className="flex w-full items-center justify-center rounded-2xl bg-green-500 py-4 text-lg font-bold text-white shadow-sm transition-all hover:bg-green-600"
+            className="flex w-full items-center justify-center rounded-2xl bg-blue-600 py-4 text-lg font-bold text-white shadow-sm transition-all hover:bg-blue-700"
           >
-            🏫 무료 단체방 (선생님/학생) 입장
+            단체방 (선생님/학생) 입장
           </Link>
         </div>
       </div>

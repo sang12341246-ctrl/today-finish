@@ -273,8 +273,8 @@ export default function GroupStudentPage() {
                     <a href="/group/role-select" onClick={(e) => handleNavigationClick(e, "/group/role-select")} className="text-gray-500 hover:text-gray-900 font-medium cursor-pointer">
                         &larr; 뒤로
                     </a>
-                    <div className="bg-blue-100 text-toss-blue text-xs px-3 py-1 rounded-full font-bold">
-                        {groupName}
+                    <div className="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full font-bold">
+                        {groupName} 단체방
                     </div>
                 </div>
 

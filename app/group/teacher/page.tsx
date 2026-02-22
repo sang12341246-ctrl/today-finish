@@ -84,8 +84,8 @@ export default function PremiumTeacherPage() {
                     <Link href="/group/role-select" className="text-gray-500 hover:text-gray-900 font-medium">
                         &larr; 역할 선택
                     </Link>
-                    <div className="bg-yellow-100 text-yellow-800 text-sm px-4 py-1.5 rounded-full font-bold shadow-sm">
-                        👑 {groupName} 선생님
+                    <div className="bg-blue-50 text-toss-blue text-sm px-4 py-1.5 rounded-full font-bold shadow-sm border border-blue-100 italic">
+                        {groupName} 단체방 선생님
                     </div>
                 </div>
 
