@@ -67,12 +67,18 @@ export default function Home() {
         </button>
 
         {/* 새로 추가된 프리미엄 단체방 입장 버튼 */}
-        <div className="w-full border-t border-gray-200 pt-6">
+        <div className="w-full border-t border-gray-200 pt-6 flex flex-col items-center">
           <Link
             href="/group"
             className="flex w-full items-center justify-center rounded-2xl bg-yellow-400 py-4 text-lg font-bold text-gray-900 shadow-sm transition-all hover:bg-yellow-500"
           >
             👑 프리미엄 단체방 입장
+          </Link>
+          <Link
+            href="/premium"
+            className="mt-3 text-xs font-semibold text-gray-400 hover:text-gray-600 underline underline-offset-2 transition-colors"
+          >
+            결제하러가기 💳
           </Link>
         </div>
       </div>
