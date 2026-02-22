@@ -8,15 +8,23 @@ export default function Home() {
   const [familyKey, setFamilyKey] = useState("");
   const router = useRouter();
 
+  // 기존 암호 기억하기 로직 추가
+  useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('family_code');
+      if (saved) setFamilyKey(saved);
+    }
+  });
+
   const handleStudentEntry = () => {
     if (!familyKey) return alert("가족 암호를 입력해주세요!");
-    localStorage.setItem("familyKey", familyKey);
+    localStorage.setItem("family_code", familyKey);
     router.push("/student");
   };
 
   const handleParentEntry = () => {
     if (!familyKey) return alert("가족 암호를 입력해주세요!");
-    localStorage.setItem("familyKey", familyKey);
+    localStorage.setItem("family_code", familyKey);
     router.push("/parent");
   };
 
