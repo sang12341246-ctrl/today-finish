@@ -86,8 +86,8 @@ export default function Home() {
         </div>
 
         {/* Premium Group Section */}
-        <div className="mt-8 px-4">
-          <Link href="/group">
+        <div className="mt-8 px-4 flex flex-col items-center gap-3">
+          <Link href="/group" className="w-full">
             <Button
               variant="outline"
               fullWidth
@@ -95,6 +95,12 @@ export default function Home() {
             >
               👑 프리미엄 단체방 입장
             </Button>
+          </Link>
+          <Link
+            href="/premium"
+            className="text-xs font-semibold text-gray-400 hover:text-gray-600 underline underline-offset-2 transition-colors"
+          >
+            프리미엄 결제하기? 💳
           </Link>
         </div>
 
