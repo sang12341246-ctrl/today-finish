@@ -116,8 +116,8 @@ export default function GroupStudentPage() {
     };
 
     const handleFinish = async () => {
-        if (!studentName.trim() || !description.trim() || (selectedFiles.length === 0 && existingImageUrls.length === 0)) {
-            alert('이름, 사진, 그리고 숙제 설명을 모두 작성해주세요!');
+        if (!studentName.trim() || !description.trim()) {
+            alert('이름과 숙제 설명을 작성해주세요!');
             return;
         }
 
@@ -385,7 +385,7 @@ export default function GroupStudentPage() {
                             {existingImageUrls.length + selectedFiles.length < MAX_IMAGES && (
                                 <label className="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer hover:bg-gray-50 hover:border-blue-400 transition-colors">
                                     <span className="text-2xl text-gray-400">+</span>
-                                    <input type="file" accept="image/*" multiple onChange={handleFileChange} className="hidden" />
+                                    <input type="file" accept="image/*, .heic, .heif, .webp" multiple onChange={handleFileChange} className="hidden" />
                                 </label>
                             )}
                         </div>
@@ -408,10 +408,10 @@ export default function GroupStudentPage() {
                     <div className="max-w-md mx-auto">
                         <button
                             onClick={handleFinish}
-                            disabled={uploading || (selectedFiles.length === 0 && existingImageUrls.length === 0) || !studentName.trim() || !description.trim()}
+                            disabled={uploading || !studentName.trim() || !description.trim()}
                             className={`
                                 w-full py-4 rounded-xl text-lg font-bold shadow-lg transition-all flex flex-col items-center justify-center relative overflow-hidden
-                                ${uploading || (selectedFiles.length === 0 && existingImageUrls.length === 0) || !studentName.trim() || !description.trim()
+                                ${uploading || !studentName.trim() || !description.trim()
                                     ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
                                     : 'bg-toss-blue hover:bg-blue-600 text-white shadow-blue-500/30 active:scale-95'
                                 }
