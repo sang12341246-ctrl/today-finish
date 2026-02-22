@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { triggerConfetti, triggerSimpleConfetti } from '@/lib/confetti';
+import imageCompression from 'browser-image-compression';
 
 const MAX_IMAGES = 10; // 대빵 지시: 사진 10장 넘어가면 컷!
 
@@ -19,6 +20,7 @@ export default function GroupStudentPage() {
 
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
+    const [isCompressing, setIsCompressing] = useState(false);
     const [isFinished, setIsFinished] = useState(false);
 
     // For editing/deleting existing homework
@@ -129,13 +131,40 @@ export default function GroupStudentPage() {
         setUploadProgress(0);
 
         try {
-            // 1. Upload multiple photos
+            // 1. Compress multiple photos
             const imageUrls: string[] = [...existingImageUrls];
             const totalFiles = selectedFiles.length;
+            const processedFiles: File[] = [];
 
             if (totalFiles > 0) {
-                for (let i = 0; i < selectedFiles.length; i++) {
+                setIsCompressing(true);
+                for (let i = 0; i < totalFiles; i++) {
                     const file = selectedFiles[i];
+                    // Skip compression if file is already small (e.g. < 1MB)
+                    // But library handles it gracefully with options.
+                    const options = {
+                        maxSizeMB: 1,
+                        maxWidthOrHeight: 1920,
+                        useWebWorker: true,
+                    };
+
+                    try {
+                        const compressedFile = await imageCompression(file, options);
+                        // Convert Blob back to File to keep metadata if possible
+                        const finalFile = new File([compressedFile], file.name, { type: file.type });
+                        processedFiles.push(finalFile);
+                    } catch (cmpError) {
+                        console.error('Compression error, using original:', cmpError);
+                        processedFiles.push(file);
+                    }
+                }
+                setIsCompressing(false);
+            }
+
+            // 2. Upload multiple photos
+            if (processedFiles.length > 0) {
+                for (let i = 0; i < processedFiles.length; i++) {
+                    const file = processedFiles[i];
                     const fileExt = file.name.split('.').pop();
                     const filePath = `group_${groupId}/${studentName}_${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
 
@@ -153,7 +182,7 @@ export default function GroupStudentPage() {
                         imageUrls.push(urlData.publicUrl);
                     }
 
-                    setUploadProgress(Math.round(((i + 1) / totalFiles) * 100));
+                    setUploadProgress(Math.round(((i + 1) / processedFiles.length) * 100));
                 }
             }
 
@@ -395,17 +424,23 @@ export default function GroupStudentPage() {
                                 />
                             )}
                             {uploading ? (
-                                <div className="flex flex-col items-center z-10">
+                                <div className="flex flex-col items-center z-10 px-4">
                                     <div className="flex items-center gap-2">
                                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                        <span>사진 전송 중... ({uploadProgress}%)</span>
+                                        <span className="text-sm md:text-base whitespace-nowrap">
+                                            {isCompressing
+                                                ? "사진을 압축하고 올리는 중입니다... ⏳"
+                                                : `사진 전송 중... (${uploadProgress}%)`}
+                                        </span>
                                     </div>
-                                    <div className="w-48 h-1 bg-white/20 rounded-full mt-2 overflow-hidden">
-                                        <div
-                                            className="h-full bg-white transition-all duration-300"
-                                            style={{ width: `${uploadProgress}%` }}
-                                        />
-                                    </div>
+                                    {!isCompressing && (
+                                        <div className="w-48 h-1 bg-white/20 rounded-full mt-2 overflow-hidden">
+                                            <div
+                                                className="h-full bg-white transition-all duration-300"
+                                                style={{ width: `${uploadProgress}%` }}
+                                            />
+                                        </div>
+                                    )}
                                 </div>
                             ) : (
                                 <span className="z-10">{existingHwId ? '숙제 수정 완료하기 ✨' : '오늘 숙제 제출하기 🚀'}</span>
