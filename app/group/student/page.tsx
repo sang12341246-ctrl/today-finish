@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { triggerConfetti, triggerSimpleConfetti } from '@/lib/confetti';
 
+const MAX_IMAGES = 10; // 대빵 지시: 사진 10장 넘어가면 컷!
+
 export default function GroupStudentPage() {
     const router = useRouter();
     const [groupId, setGroupId] = useState('');
@@ -22,6 +24,9 @@ export default function GroupStudentPage() {
     // For editing/deleting existing homework
     const [existingHwId, setExistingHwId] = useState<string | null>(null);
     const [existingImageUrls, setExistingImageUrls] = useState<string[]>([]);
+
+    // 대빵 지시: 저장 안 하고 나가는 것 방지 (isDirty 플래그)
+    const [isDirty, setIsDirty] = useState(false);
 
     useEffect(() => {
         const storedGroupId = localStorage.getItem('premium_group_id');
@@ -42,6 +47,19 @@ export default function GroupStudentPage() {
         }
     }, [router]);
 
+    // 대빵 지시: 창 닫거나 새로고침할 때 경고 띄우기
+    useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (isDirty && !isFinished) {
+                e.preventDefault();
+                e.returnValue = ''; // Chrome require this to show the prompt
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, [isDirty, isFinished]);
+
     const fetchTodayHomework = async (gId: string, sName: string) => {
         const today = new Date();
         const kstDateStr = new Date(today.getTime() + 9 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -61,6 +79,7 @@ export default function GroupStudentPage() {
                 setExistingHwId(data.id);
                 setDescription(data.description || '');
                 setExistingImageUrls(data.image_urls || []);
+                setIsDirty(false); // 초기 로드 시점엔 안 더러움
             }
         } catch (err) {
             console.error('Fetch today homework error:', err);
@@ -70,17 +89,39 @@ export default function GroupStudentPage() {
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const newFiles = Array.from(e.target.files);
-            setSelectedFiles(prev => [...prev, ...newFiles].slice(0, 5 - existingImageUrls.length));
+            const totalCurrentFiles = existingImageUrls.length + selectedFiles.length;
+
+            // 대빵 지시: 여기서 10장 넘는지 체크!
+            if (totalCurrentFiles + newFiles.length > MAX_IMAGES) {
+                alert(`사진은 최대 ${MAX_IMAGES}장까지만 올릴 수 있습니다! (현재 ${totalCurrentFiles}장 첨부됨)`);
+                // 가능한 만큼만 자르기
+                const allowedCount = MAX_IMAGES - totalCurrentFiles;
+                if (allowedCount > 0) {
+                    setSelectedFiles(prev => [...prev, ...newFiles.slice(0, allowedCount)]);
+                    setIsDirty(true);
+                }
+                return;
+            }
+
+            setSelectedFiles(prev => [...prev, ...newFiles]);
+            setIsDirty(true);
         }
     };
 
     const removeFile = (index: number) => {
         setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+        setIsDirty(true);
     };
 
     const handleFinish = async () => {
         if (!studentName.trim() || !description.trim() || (selectedFiles.length === 0 && existingImageUrls.length === 0)) {
             alert('이름, 사진, 그리고 숙제 설명을 모두 작성해주세요!');
+            return;
+        }
+
+        // 대빵 지시: 서버로 보내기 직전에도 방어 로직 한 번 더!
+        if (existingImageUrls.length + selectedFiles.length > MAX_IMAGES) {
+            alert(`오류: 사진이 ${MAX_IMAGES}장을 초과했습니다.`);
             return;
         }
 
@@ -146,6 +187,7 @@ export default function GroupStudentPage() {
             triggerConfetti();
             triggerSimpleConfetti();
             setIsFinished(true);
+            setIsDirty(false); // 저장 완료되면 맘 편히 나가도 됨!
             setSelectedFiles([]);
 
         } catch (error) {
@@ -174,6 +216,7 @@ export default function GroupStudentPage() {
             setDescription('');
             setExistingImageUrls([]);
             setSelectedFiles([]);
+            setIsDirty(false); // 지운 직후에는 나갈 수 있음
         } catch (error) {
             console.error('Delete error:', error);
             alert('삭제 중 오류가 발생했습니다.');
@@ -213,13 +256,23 @@ export default function GroupStudentPage() {
         );
     }
 
+    // 뒤로가기 링크 클릭 시 경고 처리를 위한 래퍼 함수 (Next.js Link는 beforeunload를 안 거침)
+    const handleNavigationClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+        if (isDirty && !isFinished) {
+            e.preventDefault();
+            if (confirm('저장하지 않은 내용이 있습니다. 정말 나가시겠어요? 😱')) {
+                router.push(href);
+            }
+        }
+    };
+
     return (
         <main className="flex min-h-screen flex-col items-center p-6 bg-gray-50 pb-32">
             <div className="w-full max-w-md space-y-6">
                 <div className="flex items-center justify-between pt-4">
-                    <Link href="/group/role-select" className="text-gray-500 hover:text-gray-900 font-medium">
+                    <a href="/group/role-select" onClick={(e) => handleNavigationClick(e, "/group/role-select")} className="text-gray-500 hover:text-gray-900 font-medium cursor-pointer">
                         &larr; 뒤로
-                    </Link>
+                    </a>
                     <div className="bg-blue-100 text-toss-blue text-xs px-3 py-1 rounded-full font-bold">
                         {groupName}
                     </div>
@@ -240,7 +293,7 @@ export default function GroupStudentPage() {
                         <input
                             type="text"
                             value={studentName}
-                            onChange={(e) => setStudentName(e.target.value)}
+                            onChange={(e) => { setStudentName(e.target.value); setIsDirty(true); }}
                             placeholder="이름을 알려주세요"
                             disabled={!!existingHwId}
                             className={`w-full px-4 py-3 rounded-xl border border-gray-200 outline-none transition-all ${!!existingHwId ? 'bg-gray-50 text-gray-400 cursor-not-allowed' : 'focus:border-toss-blue focus:ring-2 focus:ring-blue-100'}`}
@@ -251,7 +304,7 @@ export default function GroupStudentPage() {
                         <label className="text-sm font-bold text-gray-700 ml-1">오늘 어떤 숙제를 했나요?</label>
                         <textarea
                             value={description}
-                            onChange={(e) => setDescription(e.target.value)}
+                            onChange={(e) => { setDescription(e.target.value); setIsDirty(true); }}
                             placeholder="수학 10페이지, 영어 단어 50개 외우기 등 자세히 적어주세요!"
                             rows={4}
                             className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-toss-blue focus:ring-2 focus:ring-blue-100 outline-none transition-all resize-none"
@@ -260,7 +313,7 @@ export default function GroupStudentPage() {
 
                     <div className="space-y-2">
                         <label className="text-sm font-bold text-gray-700 ml-1">
-                            숙제 사진 {existingHwId ? '(추가 가능)' : '(최대 5장)'}
+                            숙제 사진 {existingHwId ? `(추가 가능, 최대 ${MAX_IMAGES}장)` : `(최대 ${MAX_IMAGES}장)`}
                         </label>
 
                         <div className="flex flex-wrap gap-2 mb-3">
@@ -274,7 +327,10 @@ export default function GroupStudentPage() {
                                         </div>
                                     </div>
                                     <button
-                                        onClick={() => setExistingImageUrls(prev => prev.filter((_, idx) => idx !== i))}
+                                        onClick={() => {
+                                            setExistingImageUrls(prev => prev.filter((_, idx) => idx !== i));
+                                            setIsDirty(true);
+                                        }}
                                         className="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
                                     >
                                         ✕
@@ -297,7 +353,7 @@ export default function GroupStudentPage() {
                                 </div>
                             ))}
 
-                            {existingImageUrls.length + selectedFiles.length < 5 && (
+                            {existingImageUrls.length + selectedFiles.length < MAX_IMAGES && (
                                 <label className="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer hover:bg-gray-50 hover:border-blue-400 transition-colors">
                                     <span className="text-2xl text-gray-400">+</span>
                                     <input type="file" accept="image/*" multiple onChange={handleFileChange} className="hidden" />
