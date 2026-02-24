@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import toast from "react-hot-toast";
 import { supabase } from "@/lib/supabase";
+import { PageTransition } from "@/components/PageTransition";
 
 type Role = 'student' | 'teacher';
 
@@ -192,178 +193,174 @@ export default function GroupPasswordPage() {
     };
 
     return (
-        <main className="flex min-h-screen flex-col items-center justify-center p-6 bg-gray-50">
-            <div className="absolute top-6 left-6">
-                <Link href="/" className="text-gray-500 hover:text-gray-900 font-medium hover:-translate-x-1 transition-transform inline-flex items-center gap-2">
-                    <span className="text-xl">&larr;</span> 메인으로
-                </Link>
-            </div>
-
-            <div className="w-full max-w-md bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 animate-in fade-in slide-in-from-bottom-4 duration-500 relative overflow-hidden">
-
-                {/* 상단 탭 전환버튼 (로그인 모드 / 방만들기 모드) */}
-                <div className="flex bg-gray-100 p-1 rounded-xl w-full mb-8">
-                    <button
-                        onClick={() => setIsCreating(false)}
-                        className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${!isCreating ? "bg-white text-toss-blue shadow-sm" : "text-gray-500 hover:text-gray-700"
-                            }`}
-                    >
-                        입장하기
-                    </button>
-                    <button
-                        onClick={() => setIsCreating(true)}
-                        className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${isCreating ? "bg-white text-toss-blue shadow-sm" : "text-gray-500 hover:text-gray-700"
-                            }`}
-                    >
-                        새로운 단체방 개설
-                    </button>
+        <PageTransition>
+            <main className="flex min-h-screen flex-col items-center justify-center p-6 bg-gray-50">
+                <div className="absolute top-6 left-6">
+                    <Link href="/" className="text-gray-500 hover:text-gray-900 font-medium hover:-translate-x-1 transition-transform inline-flex items-center gap-2">
+                        <span className="text-xl">&larr;</span> 메인으로
+                    </Link>
                 </div>
 
-                <div className="text-center space-y-2 mb-8">
-                    <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 leading-tight">
-                        {isCreating ? "신규 단체방 만들기" : "단체방 입장"}
-                    </h1>
-                    <p className="text-gray-500 font-medium">
-                        {isCreating ? "학급이나 학원을 위한 새로운 방을 만드세요." : "우리 단체방 이름과 암호를 입력해주세요."}
-                    </p>
-                </div>
+                <div className="w-full max-w-md bg-white p-8 rounded-[2rem] shadow-xl border border-gray-100 relative overflow-hidden">
 
-                {/* 차단 중일 때 나오는 경고 배너 */}
-                {!isCreating && lockoutEndTime && remainingTime > 0 && (
-                    <div className="w-full mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex flex-col items-center text-center animate-in fade-in">
-                        <p className="text-red-600 font-bold mb-1">
-                            보안을 위해 5회 이상 틀려 입력을 차단합니다.
-                        </p>
-                        <p className="text-red-500 text-sm font-medium">
-                            잠시 후 다시 시도해 주세요. (남은 시간: {Math.floor(remainingTime / 60)}분 {remainingTime % 60}초)
-                        </p>
-                    </div>
-                )}
-
-                {/* Role Selection Tabs (로그인 모드일 때만 표시) */}
-                {!isCreating && (
-                    <div className="flex p-1 bg-gray-100 rounded-2xl mb-8 animate-in fade-in">
+                    {/* 상단 탭 전환버튼 (로그인 모드 / 방만들기 모드) */}
+                    <div className="flex bg-gray-100 p-1.5 rounded-xl w-full mb-8 relative">
+                        <div
+                            className={`absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] bg-white rounded-lg shadow-sm transition-all duration-300 ease-in-out ${isCreating ? "translate-x-[calc(100%+6px)]" : "translate-x-0"
+                                }`}
+                        />
                         <button
-                            onClick={() => setRole('student')}
-                            disabled={!!lockoutEndTime}
-                            className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all ${role === 'student'
-                                ? 'bg-white text-toss-blue shadow-sm'
-                                : 'text-gray-500 hover:text-gray-700'
-                                } disabled:opacity-50`}
+                            onClick={() => setIsCreating(false)}
+                            className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all relative z-10 ${!isCreating ? "text-toss-blue" : "text-gray-500 hover:text-gray-700"
+                                }`}
                         >
-                            👨‍🎓 학생
+                            입장하기
                         </button>
                         <button
-                            onClick={() => setRole('teacher')}
-                            disabled={!!lockoutEndTime}
-                            className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all ${role === 'teacher'
-                                ? 'bg-white text-toss-blue shadow-sm'
-                                : 'text-gray-500 hover:text-gray-700'
-                                } disabled:opacity-50`}
+                            onClick={() => setIsCreating(true)}
+                            className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all relative z-10 ${isCreating ? "text-toss-blue" : "text-gray-500 hover:text-gray-700"
+                                }`}
                         >
-                            👩‍🏫 선생님
+                            새로운 단체방 개설
                         </button>
                     </div>
-                )}
 
-                <div className="space-y-5">
-                    {/* Common Group input - Room Name */}
-                    <div className="space-y-2 text-left">
-                        <label htmlFor="roomName" className="text-sm font-bold text-gray-700 ml-1">
-                            단체방 이름 🏫
-                        </label>
-                        <input
-                            id="roomName"
-                            type="text"
-                            value={roomName}
-                            onChange={(e) => setRoomName(e.target.value)}
-                            placeholder="예: OOO학원 중1반"
-                            disabled={loading || (!isCreating && !!lockoutEndTime)}
-                            className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:border-toss-blue focus:ring-4 focus:ring-blue-50/50 outline-none transition-all text-lg font-medium bg-gray-50 hover:bg-white disabled:bg-gray-100 disabled:text-gray-400"
-                            onKeyDown={(e) => {
-                                if (!isCreating && e.key === 'Enter' && role === 'teacher') handleEntry();
-                            }}
-                        />
+                    <div className="text-center space-y-2 mb-8">
+                        <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 leading-tight">
+                            {isCreating ? "신규 단체방 만들기" : "단체방 입장"}
+                        </h1>
+                        <p className="text-gray-500 font-medium">
+                            {isCreating ? "학급이나 학원을 위한 새로운 방을 만드세요." : "우리 단체방 이름과 암호를 입력해주세요."}
+                        </p>
                     </div>
 
-                    {/* Common Group input - Password */}
-                    <div className="space-y-2 text-left">
-                        <label htmlFor="password" className="text-sm font-bold text-gray-700 ml-1">
-                            단체방 암호 🔑
-                        </label>
-                        <input
-                            id="password"
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder={isCreating ? "시크릿 암호 설정" : "암호를 입력하세요"}
-                            disabled={loading || (!isCreating && !!lockoutEndTime)}
-                            className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:border-toss-blue focus:ring-4 focus:ring-blue-50/50 outline-none transition-all text-lg font-medium tracking-widest bg-gray-50 hover:bg-white disabled:bg-gray-100 disabled:text-gray-400"
-                            onKeyDown={(e) => {
-                                if (!isCreating && e.key === 'Enter' && role === 'teacher') handleEntry();
-                            }}
-                        />
-                    </div>
-
-                    {/* 3. 개설자 이름 (방 만들기 모드일 때만 표시) */}
-                    {isCreating && (
-                        <div className="space-y-2 text-left animate-in fade-in slide-in-from-top-2">
-                            <label className="text-sm font-bold text-gray-700 ml-1">
-                                담당 선생님 이름 👩‍🏫
-                            </label>
-                            <input
-                                type="text"
-                                placeholder="예: 김선생님"
-                                className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:border-toss-blue focus:ring-4 focus:ring-blue-50/50 outline-none transition-all text-lg font-medium bg-gray-50 hover:bg-white disabled:bg-gray-100 disabled:text-gray-400"
-                                value={creatorName}
-                                onChange={(e) => setCreatorName(e.target.value)}
-                                disabled={loading}
-                            />
+                    {/* 차단 중일 때 나오는 경고 배너 */}
+                    {!isCreating && lockoutEndTime && remainingTime > 0 && (
+                        <div className="w-full mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex flex-col items-center text-center animate-in fade-in">
+                            <p className="text-red-600 font-bold mb-1">
+                                보안을 위해 5회 이상 틀려 입력을 차단합니다.
+                            </p>
+                            <p className="text-red-500 text-sm font-medium">
+                                잠시 후 다시 시도해 주세요. (남은 시간: {Math.floor(remainingTime / 60)}분 {remainingTime % 60}초)
+                            </p>
                         </div>
                     )}
 
-                    {/* Conditional Student Name input (로그인 모드 + 학생 선택 시) */}
-                    {!isCreating && role === 'student' && (
-                        <div className="space-y-2 text-left animate-in fade-in slide-in-from-top-2 duration-300">
-                            <label htmlFor="studentName" className="text-sm font-bold text-gray-700 ml-1">
-                                내 이름 (학생) 👤
-                            </label>
+                    {/* Role Selection Tabs (로그인 모드일 때만 표시) */}
+                    {!isCreating && (
+                        <div className="flex p-1 bg-gray-100 rounded-2xl mb-8 animate-in fade-in relative">
+                            <div
+                                className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-white rounded-xl shadow-sm transition-all duration-300 ease-in-out ${role === 'teacher' ? "translate-x-[calc(100%+4px)]" : "translate-x-0"
+                                    }`}
+                            />
+                            <button
+                                onClick={() => setRole('student')}
+                                disabled={!!lockoutEndTime}
+                                className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all relative z-10 ${role === 'student' ? 'text-toss-blue' : 'text-gray-500 hover:text-gray-700'
+                                    } disabled:opacity-50`}
+                            >
+                                👨‍🎓 학생
+                            </button>
+                            <button
+                                onClick={() => setRole('teacher')}
+                                disabled={!!lockoutEndTime}
+                                className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all relative z-10 ${role === 'teacher' ? 'text-toss-blue' : 'text-gray-500 hover:text-gray-700'
+                                    } disabled:opacity-50`}
+                            >
+                                👩‍🏫 선생님
+                            </button>
+                        </div>
+                    )}
+
+                    <div className="space-y-4">
+                        {/* Common Group input - Room Name (Floating Label) */}
+                        <div className="input-group">
                             <input
-                                id="studentName"
+                                id="roomName"
                                 type="text"
-                                value={studentName}
-                                onChange={(e) => setStudentName(e.target.value)}
-                                placeholder="예: 홍길동"
-                                disabled={loading || !!lockoutEndTime}
-                                className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:border-toss-blue focus:ring-4 focus:ring-blue-50/50 outline-none transition-all text-lg font-medium bg-gray-50 hover:bg-white disabled:bg-gray-100 disabled:text-gray-400"
+                                value={roomName}
+                                onChange={(e) => setRoomName(e.target.value)}
+                                placeholder="단체방 이름 🏫"
+                                disabled={loading || (!isCreating && !!lockoutEndTime)}
                                 onKeyDown={(e) => {
-                                    if (e.key === 'Enter') handleEntry();
+                                    if (!isCreating && e.key === 'Enter' && role === 'teacher') handleEntry();
                                 }}
                             />
+                            <label htmlFor="roomName">단체방 이름 🏫</label>
                         </div>
-                    )}
-                </div>
 
-                <div className="mt-8">
-                    {isCreating ? (
-                        <button
-                            onClick={handleCreateRoom}
-                            disabled={loading}
-                            className="w-full py-4 bg-blue-600 text-white rounded-2xl text-lg font-extrabold shadow-lg shadow-blue-500/20 transition-all hover:bg-blue-700 active:scale-[0.98] disabled:opacity-50 flex justify-center items-center gap-2"
-                        >
-                            {loading ? '생성 중...' : '새로운 단체방 개설 완료 🎉'}
-                        </button>
-                    ) : (
-                        <button
-                            onClick={handleEntry}
-                            disabled={loading || !!lockoutEndTime}
-                            className="w-full py-4 bg-toss-blue text-white rounded-2xl text-lg font-extrabold shadow-lg shadow-blue-500/20 transition-all hover:bg-blue-600 active:scale-[0.98] flex justify-center items-center gap-2 disabled:opacity-50 disabled:bg-gray-300 disabled:shadow-none"
-                        >
-                            {loading ? '입장 중...' : `${role === 'student' ? '숙제하러 가기 🚀' : '채점하러 가기 🖍️'}`}
-                        </button>
-                    )}
+                        {/* Common Group input - Password (Floating Label) */}
+                        <div className="input-group">
+                            <input
+                                id="password"
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="단체방 암호 🔑"
+                                disabled={loading || (!isCreating && !!lockoutEndTime)}
+                                className="tracking-widest"
+                                onKeyDown={(e) => {
+                                    if (!isCreating && e.key === 'Enter' && role === 'teacher') handleEntry();
+                                }}
+                            />
+                            <label htmlFor="password">단체방 암호 🔑</label>
+                        </div>
+
+                        {/* 3. 개설자 이름 (방 만들기 모드일 때만 표시) */}
+                        {isCreating && (
+                            <div className="input-group animate-in fade-in slide-in-from-top-2">
+                                <input
+                                    type="text"
+                                    id="creatorName"
+                                    placeholder="담당 선생님 이름 👩‍🏫"
+                                    value={creatorName}
+                                    onChange={(e) => setCreatorName(e.target.value)}
+                                    disabled={loading}
+                                />
+                                <label htmlFor="creatorName">담당 선생님 이름 👩‍🏫</label>
+                            </div>
+                        )}
+
+                        {/* Conditional Student Name input (로그인 모드 + 학생 선택 시) */}
+                        {!isCreating && role === 'student' && (
+                            <div className="input-group animate-in fade-in slide-in-from-top-2 duration-300">
+                                <input
+                                    id="studentName"
+                                    type="text"
+                                    value={studentName}
+                                    onChange={(e) => setStudentName(e.target.value)}
+                                    placeholder="내 이름 (학생) 👤"
+                                    disabled={loading || !!lockoutEndTime}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') handleEntry();
+                                    }}
+                                />
+                                <label htmlFor="studentName">내 이름 (학생) 👤</label>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="mt-8">
+                        {isCreating ? (
+                            <button
+                                onClick={handleCreateRoom}
+                                disabled={loading}
+                                className="w-full py-4 bg-toss-blue text-white rounded-2xl text-lg font-extrabold shadow-lg shadow-blue-500/20 transition-all hover:bg-toss-blue-hover active:scale-[0.98] disabled:opacity-50 flex justify-center items-center gap-2"
+                            >
+                                {loading ? '생성 중...' : '새로운 단체방 개설 완료 🎉'}
+                            </button>
+                        ) : (
+                            <button
+                                onClick={handleEntry}
+                                disabled={loading || !!lockoutEndTime}
+                                className="w-full py-4 bg-toss-blue text-white rounded-2xl text-lg font-extrabold shadow-lg shadow-blue-500/20 transition-all hover:bg-toss-blue-hover active:scale-[0.98] flex justify-center items-center gap-2 disabled:opacity-50 disabled:bg-gray-300 disabled:shadow-none"
+                            >
+                                {loading ? '입장 중...' : `${role === 'student' ? '숙제하러 가기 🚀' : '채점하러 가기 🖍️'}`}
+                            </button>
+                        )}
+                    </div>
                 </div>
-            </div>
-        </main>
+            </main>
+        </PageTransition>
     );
 }

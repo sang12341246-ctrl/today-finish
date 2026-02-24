@@ -4,10 +4,11 @@ import { useEffect } from 'react';
 interface PhotoModalProps {
     src: string | null;
     date: string | null;
+    studentName?: string;
     onClose: () => void;
 }
 
-export function PhotoModal({ src, date, onClose }: PhotoModalProps) {
+export function PhotoModal({ src, date, studentName, onClose }: PhotoModalProps) {
     useEffect(() => {
         const handleEsc = (e: KeyboardEvent) => {
             if (e.key === 'Escape') onClose();
@@ -39,7 +40,14 @@ export function PhotoModal({ src, date, onClose }: PhotoModalProps) {
                 </div>
 
                 <div className="text-center mb-2 mt-2">
-                    <h3 className="text-lg font-bold text-gray-900">{date}의 기록 📸</h3>
+                    <h3 className="text-lg font-bold text-gray-900">
+                        {date}의 기록 📸
+                    </h3>
+                    {studentName && (
+                        <p className="text-sm text-toss-blue font-medium mt-1">
+                            👤 {studentName} 학생
+                        </p>
+                    )}
                 </div>
 
                 <div className="relative aspect-[3/4] w-full bg-gray-100 rounded-xl overflow-hidden">

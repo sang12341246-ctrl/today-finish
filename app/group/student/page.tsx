@@ -8,6 +8,8 @@ import toast from 'react-hot-toast';
 import { triggerConfetti, triggerSimpleConfetti } from '@/lib/confetti';
 import imageCompression from 'browser-image-compression';
 import { format, subDays, parseISO } from 'date-fns';
+import { PageTransition } from '@/components/PageTransition';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const MAX_IMAGES = 10;
 
@@ -302,27 +304,64 @@ export default function GroupStudentPage() {
 
     if (isFinished) {
         return (
-            <main className="flex min-h-screen flex-col items-center justify-center p-6 bg-white transition-all">
-                <div className="text-center space-y-6 animate-in zoom-in duration-500">
-                    <div className="flex flex-col items-center">
-                        <div className="w-24 h-24 bg-green-50 text-green-500 rounded-full flex items-center justify-center text-5xl mb-6 shadow-md border-2 border-green-100 animate-bounce">
-                            🚀
-                        </div>
-                        <h1 className="text-4xl font-extrabold text-gray-900">제출 완료! 🎉</h1>
-                    </div>
-                    <p className="text-gray-500 text-lg font-medium">선생님께 숙제가 전송되었어요. 멋져요!</p>
-                    <button
-                        onClick={() => {
-                            setIsFinished(false);
-                            setUploadProgress(0);
-                            fetchTodayHomework(groupId, studentName);
-                        }}
-                        className="mt-8 px-6 py-4 bg-toss-blue text-white font-extrabold rounded-2xl hover:bg-blue-600 transition-colors shadow-xl shadow-blue-500/20 active:scale-95"
-                    >
-                        {existingHwId ? '내용 다시 보기' : '숙제 창으로 돌아가기'}
-                    </button>
-                </div>
-            </main>
+            <PageTransition>
+                <main className="flex min-h-screen flex-col items-center bg-gray-50 pb-32">
+                    <AnimatePresence>
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="w-full max-w-md bg-white rounded-[2rem] shadow-xl p-10 mt-12 flex flex-col items-center justify-center text-center space-y-6 relative overflow-hidden"
+                        >
+                            {/* Celebration Animation */}
+                            <motion.div
+                                initial={{ y: 50, opacity: 0 }}
+                                animate={{ y: [0, -20, 0], opacity: 1 }}
+                                transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
+                                className="text-8xl mb-4"
+                            >
+                                🚀
+                            </motion.div>
+
+                            <div className="space-y-3 z-10 relative">
+                                <motion.h2
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.4 }}
+                                    className="text-3xl font-black text-gray-900"
+                                >
+                                    제출 완료! 🎉
+                                </motion.h2>
+                                <motion.p
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ delay: 0.6 }}
+                                    className="text-gray-500 font-medium leading-relaxed"
+                                >
+                                    선생님이 올리신 사진을 확인하실 거예요.<br />조금만 기다려주세요!
+                                </motion.p>
+                            </div>
+
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.8 }}
+                                className="w-full pt-4"
+                            >
+                                <button
+                                    onClick={() => {
+                                        setIsFinished(false);
+                                        setUploadProgress(0);
+                                        fetchTodayHomework(groupId, studentName);
+                                    }}
+                                    className="w-full px-6 py-4 bg-toss-blue text-white font-extrabold rounded-2xl hover:bg-toss-blue-hover transition-colors shadow-xl shadow-blue-500/20 active:scale-95"
+                                >
+                                    {existingHwId ? '내용 다시 보기' : '숙제 창으로 돌아가기'}
+                                </button>
+                            </motion.div>
+                        </motion.div>
+                    </AnimatePresence>
+                </main>
+            </PageTransition>
         );
     }
 
@@ -346,191 +385,234 @@ export default function GroupStudentPage() {
     const expPercentage = Math.min((currentEXP / maxEXP) * 100, 100);
 
     return (
-        <main className="flex min-h-screen flex-col items-center p-6 bg-gray-50 pb-32">
-            <div className="w-full max-w-md space-y-6">
-                <div className="flex items-center justify-between pt-4">
-                    <a href="/group" onClick={(e) => handleNavigationClick(e, "/group")} className="text-gray-500 hover:text-gray-900 font-medium cursor-pointer flex items-center gap-1">
-                        <span className="text-lg">&larr;</span> 뒤로
-                    </a>
-                    <div className="bg-gray-100 text-gray-600 text-xs px-3 py-1.5 rounded-full font-bold shadow-sm">
-                        {groupName} 단체방
-                    </div>
-                </div>
-
-                {/* Gamification Area: Feedback box & EXP Bar */}
-                {studentName && (
-                    <div className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-500">
-                        {/* EXP Bar (Streak Tracker) */}
-                        <div className="bg-white p-4 rounded-3xl shadow-sm border border-orange-100 flex flex-col gap-2">
-                            <div className="flex justify-between items-end">
-                                <span className="text-sm font-bold text-gray-700 flex items-center gap-1">
-                                    🔥 연속 <span className="text-orange-500 text-lg">{streak}</span>일째
-                                </span>
-                                <span className="text-xs font-bold text-gray-400">LV.{Math.floor(streak / maxEXP) + 1}</span>
-                            </div>
-                            <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden relative">
-                                <div
-                                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-orange-400 to-yellow-400 transition-all duration-1000 ease-out rounded-full"
-                                    style={{ width: `${expPercentage}%` }}
-                                />
-                            </div>
-                            <p className="text-[10px] text-center font-bold text-gray-400 mt-1">다음 레벨까지 {maxEXP - currentEXP}일 남았어요!</p>
+        <PageTransition>
+            <main className="flex min-h-screen flex-col items-center bg-gray-50 pb-32">
+                <div className="w-full max-w-md px-6 flex flex-col items-center">
+                    <div className="w-full flex items-center justify-between pt-10 mb-6">
+                        <a href="/group" onClick={(e) => handleNavigationClick(e, "/group")} className="text-gray-500 hover:text-gray-900 font-medium cursor-pointer flex items-center gap-1 transition-all hover:-translate-x-1">
+                            <span className="text-xl">&larr;</span> 뒤로
+                        </a>
+                        <div className="bg-white text-gray-600 text-xs px-3 py-1.5 rounded-full font-bold shadow-sm border border-gray-100">
+                            {groupName} 단체방
                         </div>
+                    </div>
 
-                        {/* Teacher's Feedback Inbox */}
-                        {teacherFeedback && (
-                            <div className="bg-blue-50/50 p-4 rounded-3xl border border-blue-100 flex items-start gap-4">
-                                <div className="text-4xl shrink-0 drop-shadow-sm self-center">
-                                    {teacherFeedback.reaction_type || '💌'}
+                    {/* Gamification Area: Feedback box & EXP Bar */}
+                    {studentName && (
+                        <div className="w-full space-y-4 mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
+                            {/* EXP Bar (Streak Tracker) */}
+                            <div className="bg-white p-5 rounded-3xl shadow-sm border border-orange-100 flex flex-col gap-2 relative overflow-hidden">
+                                <div className="flex justify-between items-end relative z-10">
+                                    <span className="text-sm font-bold text-gray-700 flex items-center gap-1.5">
+                                        <span className="text-lg">🔥</span> 단기 집중 연속 <span className="text-orange-500 text-lg mx-0.5">{streak}</span>일째
+                                    </span>
+                                    <span className="bg-orange-100 text-orange-600 px-2 py-0.5 rounded-md text-xs font-bold">LV.{Math.floor(streak / maxEXP) + 1}</span>
                                 </div>
-                                <div className="flex-1">
-                                    <h3 className="text-sm font-bold text-blue-900 mb-1">선생님의 최신 답장함</h3>
-                                    <p className="text-sm text-gray-700 font-medium whitespace-pre-wrap leading-relaxed">
-                                        {teacherFeedback.content ? `"${teacherFeedback.content}"` : '선생님이 확인했어요!'}
-                                    </p>
+                                <div className="w-full h-3 bg-orange-50 rounded-full overflow-hidden relative mt-1">
+                                    <div
+                                        className="absolute top-0 left-0 h-full bg-gradient-to-r from-orange-400 to-yellow-400 transition-all duration-1000 ease-out rounded-full"
+                                        style={{ width: `${expPercentage}%` }}
+                                    />
                                 </div>
+                                <p className="text-xs text-center font-bold text-orange-400 mt-1 relative z-10">다음 레벨업 보상까지 {maxEXP - currentEXP}일 남았어요!</p>
                             </div>
-                        )}
-                    </div>
-                )}
 
-
-                {/* Homework Upload Form */}
-                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 space-y-6">
-                    <div>
-                        <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">
-                            {existingHwId ? '숙제 수정하기 ✏️' : '숙제 올리기 📝'}
-                        </h1>
-                        <p className="text-gray-500 mt-1 font-medium text-sm">
-                            {existingHwId ? '오늘 제출한 숙제를 수정할 수 있어요.' : '오늘 한 숙제를 자랑해 볼까요?'}
-                        </p>
-                    </div>
-
-                    <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-700 ml-1">내 이름 👤</label>
-                        <input
-                            type="text"
-                            value={studentName}
-                            onChange={handleNameChange}
-                            onBlur={() => studentName && fetchStudentStats(groupId, studentName)}
-                            placeholder="이름을 알려주세요"
-                            disabled={!!existingHwId}
-                            className={`w-full px-5 py-4 rounded-2xl border border-gray-200 outline-none transition-all font-medium ${!!existingHwId ? 'bg-gray-50 text-gray-400 cursor-not-allowed' : 'bg-gray-50 hover:bg-white focus:bg-white focus:border-toss-blue focus:ring-4 focus:ring-blue-50/50'}`}
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-700 ml-1">숙제 설명 ✍️</label>
-                        <textarea
-                            value={description}
-                            onChange={(e) => { setDescription(e.target.value); setIsDirty(true); }}
-                            placeholder="수학 10방울, 영어 단어 50개 외우기 등 자세히 적어주세요!"
-                            rows={4}
-                            className="w-full px-5 py-4 rounded-2xl border border-gray-200 bg-gray-50 hover:bg-white focus:bg-white focus:border-toss-blue focus:ring-4 focus:ring-blue-50/50 outline-none transition-all resize-none font-medium"
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-700 ml-1">
-                            숙제 사진 📸 {existingHwId ? `(추가 가능, 최대 ${MAX_IMAGES}장)` : `(최대 ${MAX_IMAGES}장)`}
-                        </label>
-
-                        <div className="flex flex-wrap gap-3 mb-3">
-                            {/* Existing Images */}
-                            {existingImageUrls.map((url, i) => (
-                                <div key={`existing-${i}`} className="relative group">
-                                    <div className="w-20 h-20 rounded-2xl bg-gray-100 overflow-hidden border border-green-200 shadow-sm">
-                                        <img src={url} alt="existing" className="w-full h-full object-cover" />
-                                        <div className="absolute inset-0 bg-green-500/10 flex items-center justify-center">
-                                            <span className="bg-white/95 text-[10px] font-bold px-1.5 py-0.5 rounded text-green-700 shadow-sm border border-green-100">제출됨</span>
-                                        </div>
+                            {/* Teacher's Feedback Inbox */}
+                            {teacherFeedback ? (
+                                <div className="bg-blue-50/80 p-5 rounded-3xl border border-blue-100 flex items-start gap-4 shadow-sm group hover:bg-blue-50 transition-colors">
+                                    <div className="text-4xl shrink-0 drop-shadow-sm self-center group-hover:scale-110 transition-transform">
+                                        {teacherFeedback.reaction_type || '💌'}
                                     </div>
-                                    <button
-                                        onClick={() => {
-                                            setExistingImageUrls(prev => prev.filter((_, idx) => idx !== i));
-                                            setIsDirty(true);
-                                        }}
-                                        className="absolute -top-2 -right-2 bg-red-500 text-white w-7 h-7 rounded-full flex items-center justify-center text-xs shadow-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 active:scale-95"
-                                    >
-                                        ✕
-                                    </button>
-                                </div>
-                            ))}
-
-                            {/* New Selections */}
-                            {selectedFiles.map((file, i) => (
-                                <div key={`new-${i}`} className="relative group">
-                                    <div className="w-20 h-20 rounded-2xl bg-gray-100 overflow-hidden border-2 border-toss-blue/50 shadow-sm">
-                                        <img src={URL.createObjectURL(file)} alt="preview" className="w-full h-full object-cover opacity-80" />
-                                    </div>
-                                    <button
-                                        onClick={() => removeFile(i)}
-                                        className="absolute -top-2 -right-2 bg-red-500 text-white w-7 h-7 rounded-full flex items-center justify-center text-xs shadow-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 active:scale-95"
-                                    >
-                                        ✕
-                                    </button>
-                                </div>
-                            ))}
-
-                            {existingImageUrls.length + selectedFiles.length < MAX_IMAGES && (
-                                <label className="w-20 h-20 rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer hover:bg-gray-50 hover:border-blue-400 hover:text-blue-500 transition-colors text-gray-400 bg-gray-50">
-                                    <span className="text-3xl">+</span>
-                                    <input type="file" accept="image/*, .heic, .heif, .webp" multiple onChange={handleFileChange} className="hidden" />
-                                </label>
-                            )}
-                        </div>
-                    </div>
-
-                    {existingHwId && (
-                        <div className="pt-4 border-t border-gray-50 flex justify-end">
-                            <button
-                                onClick={handleDelete}
-                                disabled={uploading}
-                                className="text-xs font-bold text-gray-400 hover:text-red-600 hover:bg-red-50 px-3 py-2 rounded-xl transition-all"
-                            >
-                                오늘 제출 데이터 삭제 🗑️
-                            </button>
-                        </div>
-                    )}
-                </div>
-
-                <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-md border-t border-gray-100 z-30 pb-safe">
-                    <div className="max-w-md mx-auto">
-                        <button
-                            onClick={handleFinish}
-                            disabled={uploading || !studentName.trim() || !description.trim()}
-                            className={`
-                                w-full py-4 rounded-2xl text-lg font-extrabold shadow-lg transition-all flex flex-col items-center justify-center relative overflow-hidden
-                                ${uploading || !studentName.trim() || !description.trim()
-                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none border border-gray-200'
-                                    : 'bg-toss-blue hover:bg-blue-600 text-white shadow-blue-500/20 active:scale-[0.98]'
-                                }
-                            `}
-                        >
-                            {uploading && (
-                                <div
-                                    className="absolute inset-0 bg-blue-600 transition-all duration-300"
-                                    style={{ width: `${uploadProgress}%`, opacity: 0.2 }}
-                                />
-                            )}
-                            {uploading ? (
-                                <div className="flex flex-col items-center z-10 px-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-5 h-5 border-2 border-white/80 border-t-transparent rounded-full animate-spin" />
-                                        <span className="text-sm md:text-base whitespace-nowrap">
-                                            {isCompressing
-                                                ? "사진 최적화 중... ⏳"
-                                                : `로켓 쏘는 중! 🚀 (${uploadProgress}%)`}
-                                        </span>
+                                    <div className="flex-1">
+                                        <h3 className="text-sm font-bold text-toss-blue mb-1">선생님의 최근 답장</h3>
+                                        <p className="text-sm text-gray-800 font-medium whitespace-pre-wrap leading-relaxed">
+                                            {teacherFeedback.content ? `"${teacherFeedback.content}"` : '선생님이 확인했어요!'}
+                                        </p>
                                     </div>
                                 </div>
                             ) : (
-                                <span className="z-10">{existingHwId ? '수정 완료하기 ✨' : '로켓 발사! (숙제 제출) 🚀'}</span>
+                                <div className="bg-gray-50 border border-dashed border-gray-200 p-5 rounded-3xl flex items-center gap-4 grayscale opacity-60">
+                                    <div className="text-3xl shrink-0 drop-shadow-sm self-center">📮</div>
+                                    <div>
+                                        <p className="text-sm font-bold text-gray-500">아직 선생님의 답장이 없어요</p>
+                                        <p className="text-xs font-semibold text-gray-400">숙제를 제출하고 기다려볼까요?</p>
+                                    </div>
+                                </div>
                             )}
-                        </button>
+                        </div>
+                    )}
+
+
+                    {/* Homework Upload Form */}
+                    <div className="w-full bg-white p-8 rounded-[2rem] shadow-xl border border-gray-100 space-y-6 relative overflow-hidden">
+                        <div className="mb-2">
+                            <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight leading-tight">
+                                {existingHwId ? '숙제 수정하기 ✏️' : '오늘의 공부 인증 🎉'}
+                            </h1>
+                            <p className="text-gray-500 mt-2 font-medium text-sm">
+                                {existingHwId ? '오늘 제출한 숙제를 수정할 수 있어요.' : '오늘 공부한 내용을 쿨하게 남겨보세요!'}
+                            </p>
+                        </div>
+
+                        {/* 1. Name Input (Floating Label) */}
+                        <div className="input-group">
+                            <input
+                                id="studentName"
+                                type="text"
+                                value={studentName}
+                                onChange={handleNameChange}
+                                onBlur={() => studentName && fetchStudentStats(groupId, studentName)}
+                                placeholder="내 이름 👤"
+                                disabled={!!existingHwId}
+                            />
+                            <label htmlFor="studentName">내 이름 👤</label>
+                        </div>
+
+                        {/* 2. Description (Floating Label) */}
+                        <div className="input-group">
+                            <textarea
+                                id="description"
+                                value={description}
+                                onChange={(e) => { setDescription(e.target.value); setIsDirty(true); }}
+                                placeholder="무엇을 공부했나요? (예: 수학 개념 30p) ✍️"
+                                rows={4}
+                                className="resize-none"
+                            />
+                            <label htmlFor="description">오늘의 공부 내용 ✍️</label>
+                        </div>
+
+                        <div className="space-y-3">
+                            <div className="flex justify-between items-end mb-1 ml-1">
+                                <label className="text-sm font-bold text-gray-700">
+                                    인증 사진 📸 {existingHwId && <span className="text-toss-blue font-semibold">(추가 가능)</span>}
+                                </label>
+                                <span className="text-xs font-bold px-2 py-1 bg-gray-100 text-gray-500 rounded-md">
+                                    {existingImageUrls.length + selectedFiles.length} / {MAX_IMAGES}장
+                                </span>
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-2">
+                                {/* Existing Images */}
+                                {existingImageUrls.map((url, i) => (
+                                    <div key={`existing-${i}`} className="relative aspect-square rounded-xl overflow-hidden group shadow-sm border border-gray-100">
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img src={url} alt="기존 첨부사진" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
+                                        <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        <button
+                                            onClick={() => {
+                                                setExistingImageUrls(prev => prev.filter((_, idx) => idx !== i));
+                                                setIsDirty(true);
+                                            }}
+                                            className="absolute top-1.5 right-1.5 bg-black/60 backdrop-blur-sm text-white w-7 h-7 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/80 active:scale-95"
+                                            type="button"
+                                            aria-label="기존 이미지 삭제"
+                                        >
+                                            ✕
+                                        </button>
+                                        <div className="absolute bottom-1.5 left-1.5 bg-green-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm">
+                                            제출됨
+                                        </div>
+                                    </div>
+                                ))}
+
+                                {/* New Selections */}
+                                {selectedFiles.map((file, i) => (
+                                    <div key={`new-${i}`} className="relative aspect-square rounded-xl overflow-hidden group shadow-sm border border-toss-blue/30">
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img src={URL.createObjectURL(file)} alt="새 첨부사진" className="w-full h-full object-cover opacity-90 transition-transform duration-300 group-hover:scale-110" />
+                                        <div className="absolute inset-0 bg-toss-blue/10" />
+                                        <button
+                                            onClick={() => removeFile(i)}
+                                            className="absolute top-1.5 right-1.5 bg-black/60 backdrop-blur-sm text-white w-7 h-7 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/80 active:scale-95"
+                                            type="button"
+                                            aria-label="안올릴래"
+                                        >
+                                            ✕
+                                        </button>
+                                        <div className="absolute bottom-1.5 left-1.5 bg-toss-blue text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm">
+                                            새로 추가
+                                        </div>
+                                    </div>
+                                ))}
+
+                                {/* Upload Trigger Button */}
+                                {existingImageUrls.length + selectedFiles.length < MAX_IMAGES && (
+                                    <label className="aspect-square rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:bg-blue-50 hover:border-blue-400 hover:text-blue-500 transition-all text-gray-400 bg-gray-50 active:scale-[0.98] gap-1">
+                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
+                                        <span className="text-xs font-bold font-sans">추가</span>
+                                        <input type="file" accept="image/*, .heic, .heif, .webp" multiple onChange={handleFileChange} className="hidden" />
+                                    </label>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Upload Progress */}
+                        {uploading && uploadProgress > 0 && (
+                            <div className="w-full space-y-2 animate-in fade-in">
+                                <div className="flex justify-between text-xs font-bold text-toss-blue">
+                                    <span>업로드 우주선 발사 중... 🚀</span>
+                                    <span>{uploadProgress}%</span>
+                                </div>
+                                <div className="w-full bg-blue-100 rounded-full h-3 overflow-hidden">
+                                    <div
+                                        className="bg-toss-blue h-3 rounded-full transition-all duration-300 animate-pulse"
+                                        style={{ width: `${uploadProgress}%` }}
+                                    ></div>
+                                </div>
+                            </div>
+                        )}
+
+                        {existingHwId && (
+                            <div className="pt-2 flex justify-end">
+                                <button
+                                    onClick={handleDelete}
+                                    disabled={uploading}
+                                    className="text-sm font-bold text-gray-400 hover:text-red-500 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-all"
+                                >
+                                    오늘 제출 데이터 초기화 🗑️
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="fixed bottom-0 left-0 right-0 p-5 bg-white/80 backdrop-blur-md border-t border-gray-100 z-30 pb-safe">
+                        <div className="max-w-md mx-auto">
+                            <button
+                                onClick={handleFinish}
+                                disabled={uploading || !studentName.trim() || !description.trim() || (existingImageUrls.length === 0 && selectedFiles.length === 0)}
+                                className={`
+                                    w-full py-4 rounded-2xl text-lg font-extrabold shadow-lg transition-all flex flex-col items-center justify-center relative overflow-hidden h-[60px]
+                                    ${uploading || !studentName.trim() || !description.trim() || (existingImageUrls.length === 0 && selectedFiles.length === 0)
+                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none border border-gray-200'
+                                        : 'bg-toss-blue hover:bg-toss-blue-hover text-white shadow-blue-500/20 active:scale-[0.98]'
+                                    }
+                                `}
+                            >
+                                {uploading && (
+                                    <div
+                                        className="absolute inset-0 bg-blue-600 transition-all duration-300"
+                                        style={{ width: `${uploadProgress}%`, opacity: 0.2 }}
+                                    />
+                                )}
+                                {uploading ? (
+                                    <div className="flex flex-col items-center z-10">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-5 h-5 border-2 border-white/80 border-t-transparent rounded-full animate-spin" />
+                                            <span className="text-base whitespace-nowrap">
+                                                {isCompressing
+                                                    ? "사진 최적화 중... ⏳"
+                                                    : `로켓 쏘는 중! 🚀`}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <span className="z-10">{existingHwId ? '수정 완료하기 ✨' : '완료하고 발사! 🚀'}</span>
+                                )}
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </main>
+            </main>
+        </PageTransition>
     );
 }

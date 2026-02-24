@@ -1,8 +1,7 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 import { PremiumHomeworkModal } from './PremiumHomeworkModal';
 import { supabase } from '@/lib/supabase';
+import { motion } from 'framer-motion';
 
 interface Homework {
     id: string;
@@ -63,19 +62,27 @@ export function TeacherDashboardGrid({ homeworks }: TeacherDashboardGridProps) {
 
     if (uniqueStudents.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center p-12 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex flex-col items-center justify-center py-24 px-6 bg-white rounded-[2rem] border-2 border-dashed border-gray-200"
+            >
+                <div className="text-7xl mb-6 animate-bounce">
+                    😴
+                </div>
+                <h3 className="text-2xl font-extrabold text-gray-900 mb-2">아직 빈둥빈둥..</h3>
                 <p className="text-gray-500 font-medium text-lg text-center">
                     아직 숙제를 제출한 학생이 없어요.<br />
-                    <span className="text-sm">실시간으로 업데이트 대기 중... ⏳</span>
+                    <span className="text-sm text-gray-400 mt-2 block">실시간으로 업데이트 대기 중... ⏳</span>
                 </p>
-            </div>
+            </motion.div>
         );
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-8">
             <div className="flex justify-end pr-2">
-                <label className="flex items-center gap-3 cursor-pointer group">
+                <label className="flex items-center gap-3 cursor-pointer group bg-gray-50 px-4 py-2 rounded-full border border-gray-100 hover:bg-gray-100 transition-colors">
                     <span className="text-sm font-bold text-gray-700 select-none group-hover:text-toss-blue transition-colors">
                         ✅ 안 읽은 숙제만 보기
                     </span>
@@ -92,28 +99,38 @@ export function TeacherDashboardGrid({ homeworks }: TeacherDashboardGridProps) {
             </div>
 
             {displayedStudents.length === 0 ? (
-                <div className="flex flex-col items-center justify-center p-12 bg-gray-50 rounded-3xl border border-gray-100">
-                    <p className="text-gray-500 font-medium text-lg text-center">
-                        짝짝짝! 👏<br />
-                        <span className="text-sm">모든 숙제 검사를 완료했어요!</span>
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="flex flex-col items-center justify-center py-20 bg-blue-50/50 rounded-[2rem] border border-blue-100"
+                >
+                    <div className="text-7xl mb-6">
+                        🎉
+                    </div>
+                    <h3 className="text-2xl font-extrabold text-toss-blue mb-2">짝짝짝! 모두 다 봤어요!</h3>
+                    <p className="text-blue-600/70 font-medium text-lg text-center">
+                        모든 학생의 숙제 검사를 완료했어요. 선생님 최고! 👍
                     </p>
-                </div>
+                </motion.div>
             ) : (
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 w-full">
-                    {displayedStudents.map((hw) => (
-                        <div
+                    {displayedStudents.map((hw, index) => (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.05 }}
                             key={hw.id}
-                            className="relative bg-white border border-gray-100 rounded-3xl p-4 flex flex-col items-center shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer animate-in zoom-in slide-in-from-bottom-4 duration-500 group"
+                            className="relative bg-white border border-gray-100 rounded-[1.5rem] p-4 flex flex-col items-center shadow-sm hover:shadow-2xl hover:shadow-toss-blue/10 hover:-translate-y-2 transition-all duration-300 cursor-pointer group"
                             onClick={() => setSelectedHw(hw)}
                         >
                             {/* Status label / checkmark */}
                             <div className={`
-                            absolute -top-3 -right-3 w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shadow-lg z-10 transition-transform group-hover:scale-110
+                            absolute -top-3 -right-3 w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shadow-lg z-10 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12
                             ${(hw.feedback_count || 0) > 0
-                                    ? 'bg-green-500 text-white ring-4 ring-green-100'
-                                    : 'bg-gray-200 text-gray-500 ring-4 ring-gray-100'}
+                                    ? 'bg-green-500 text-white ring-4 ring-green-50'
+                                    : 'bg-orange-500 text-white ring-4 ring-orange-50 animate-pulse'}
                         `}>
-                                {(hw.feedback_count || 0) > 0 ? '✓' : '?'}
+                                {(hw.feedback_count || 0) > 0 ? '✓' : '!'}
                             </div>
 
                             {/* Thumbnail Container */}
@@ -125,31 +142,33 @@ export function TeacherDashboardGrid({ homeworks }: TeacherDashboardGridProps) {
                                             alt={`${hw.student_name}`}
                                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                         />
+                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
                                         {hw.image_urls.length > 1 && (
-                                            <div className="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-md backdrop-blur-sm">
+                                            <div className="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] font-bold px-2 py-1 rounded-lg backdrop-blur-md shadow-sm">
                                                 +{hw.image_urls.length - 1}장
                                             </div>
                                         )}
                                     </>
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-gray-300">
-                                        No Image
+                                    <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-50/80">
+                                        <span className="text-2xl mb-1">📝</span>
+                                        <span className="text-xs font-bold">글만 작성함</span>
                                     </div>
                                 )}
                             </div>
 
                             {/* Student Name & Meta */}
-                            <div className="text-center w-full">
-                                <p className="font-extrabold text-gray-900 text-base mb-1 truncate">{hw.student_name}</p>
+                            <div className="text-center w-full mt-auto">
+                                <p className="font-extrabold text-gray-900 text-base mb-2 truncate group-hover:text-toss-blue transition-colors">{hw.student_name}</p>
                                 <div className="flex items-center justify-center gap-2">
-                                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold
-                                    ${(hw.feedback_count || 0) > 0 ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-400'}
+                                    <span className={`text-[11px] px-3 py-1 rounded-full font-bold shadow-sm transition-colors
+                                    ${(hw.feedback_count || 0) > 0 ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-orange-50 text-orange-600 border border-orange-100'}
                                 `}>
-                                        {(hw.feedback_count || 0) > 0 ? '피드백 완료' : '검사 전'}
+                                        {(hw.feedback_count || 0) > 0 ? '검사완료' : '검사 대기중'}
                                     </span>
                                 </div>
                             </div>
-                        </div>
+                        </motion.div>
                     ))}
                 </div>
             )}

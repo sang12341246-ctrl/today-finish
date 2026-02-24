@@ -12,28 +12,43 @@ export default function StudentPage() {
     const router = useRouter();
     const [isFinished, setIsFinished] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [familyCode, setFamilyCode] = useState('');
+
+    // SaaS 전환: familyCode 대신 roomName과 studentName 명확히 사용
+    const [roomName, setRoomName] = useState('');
+    const [studentName, setStudentName] = useState('');
+
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [uploading, setUploading] = useState(false);
     const [streak, setStreak] = useState(0);
 
     useEffect(() => {
-        const code = localStorage.getItem('family_code');
-        if (!code) {
-            toast.error('가족 암호가 필요해요!');
+        // 기존 그룹/학생 정보 확인
+        const savedRoom = localStorage.getItem('premium_group_name');
+        const savedStudent = localStorage.getItem('premium_student_name');
+
+        if (!savedRoom || !savedStudent) {
+            toast.error('입장 정보가 없습니다. 다시 로그인해주세요!');
             router.push('/');
             return;
         }
-        setFamilyCode(code);
 
-        const checkStatus = async (familyCode: string) => {
+        setRoomName(savedRoom);
+        setStudentName(savedStudent);
+
+        const checkStatus = async (room: string, student: string) => {
             const today = format(new Date(), 'yyyy-MM-dd');
 
-            const { data: allData } = await supabase
+            // 내 방(room_name)과 내 이름(student_name)으로 내 기록만 가져옴
+            const { data: allData, error } = await supabase
                 .from('study_logs')
                 .select('study_date')
-                .eq('family_code', familyCode)
+                .eq('room_name', room)
+                .eq('student_name', student)
                 .order('study_date', { ascending: false });
+
+            if (error) {
+                console.error(error);
+            }
 
             if (allData && allData.length > 0) {
                 const todayDone = allData.some(log => log.study_date === today);
@@ -76,7 +91,7 @@ export default function StudentPage() {
             setLoading(false);
         };
 
-        checkStatus(code);
+        checkStatus(savedRoom, savedStudent);
     }, [router]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -120,7 +135,8 @@ export default function StudentPage() {
                 .from('study_logs')
                 .insert([
                     {
-                        family_code: familyCode,
+                        room_name: roomName,
+                        student_name: studentName,
                         study_date: today,
                         image_url: publicUrl
                     }
@@ -155,14 +171,16 @@ export default function StudentPage() {
             <div className="absolute top-6 right-6">
                 <button
                     onClick={() => {
-                        if (confirm('가족 암호를 초기화하고 로그아웃 하시겠습니까?')) {
-                            localStorage.removeItem('family_code');
+                        if (confirm('접속 정보를 초기화하고 메인으로 돌아가시겠습니까?')) {
+                            localStorage.removeItem('premium_group_name');
+                            localStorage.removeItem('premium_student_name');
+                            localStorage.removeItem('premium_group_id');
                             router.push('/');
                         }
                     }}
                     className="text-gray-400 hover:text-red-500 text-sm font-medium transition-colors"
                 >
-                    암호 초기화 🔄
+                    로그아웃 🔄
                 </button>
             </div>
 
@@ -176,9 +194,14 @@ export default function StudentPage() {
                             ? "오늘 목표를 달성했어요. 내일도 화이팅!"
                             : "공부를 마쳤다면 버튼을 꾹 눌러주세요."}
                     </p>
-                    <p className="text-sm text-toss-blue font-medium bg-blue-50 py-1.5 px-4 rounded-full inline-block mt-2 shadow-sm">
-                        가족 암호: {familyCode}
-                    </p>
+                    <div className="mt-3 flex gap-2 justify-center">
+                        <span className="text-sm text-toss-blue font-medium bg-blue-50 py-1.5 px-4 rounded-full shadow-sm">
+                            🏫 {roomName}
+                        </span>
+                        <span className="text-sm text-green-700 font-medium bg-green-50 py-1.5 px-4 rounded-full shadow-sm">
+                            👤 {studentName}
+                        </span>
+                    </div>
                 </div>
 
                 {/* Student Dashboard (Streak) */}
@@ -247,9 +270,9 @@ export default function StudentPage() {
 
                 {isFinished && (
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-                        <Link href="/parent">
+                        <Link href="/group">
                             <span className="text-sm text-gray-400 hover:text-gray-600 underline decoration-gray-300 hover:decoration-gray-400 underline-offset-4 transition-colors">
-                                달력 확인하러 가기
+                                단체방으로 돌아가기
                             </span>
                         </Link>
                     </div>

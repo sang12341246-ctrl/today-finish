@@ -38,4 +38,52 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Floating Label Utilities (Modern Input) */
+.input-group {
+  @apply relative;
+}
+
+.input-group input,
+.input-group textarea {
+  @apply w-full px-5 pb-3 pt-6 rounded-2xl border border-gray-200 bg-gray-50 hover:bg-white focus:bg-white focus:border-toss-blue focus:ring-4 focus:ring-blue-50/50 outline-none transition-all font-medium disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed;
+}
+
+.input-group label {
+  @apply absolute left-5 top-5 text-gray-500 font-bold text-base transition-all duration-200 pointer-events-none origin-left;
+}
+
+.input-group input:focus ~ label,
+.input-group input:not(:placeholder-shown) ~ label,
+.input-group textarea:focus ~ label,
+.input-group textarea:not(:placeholder-shown) ~ label {
+  @apply -translate-y-3.5 scale-75 text-toss-blue;
+}
+
+/* Hide placeholder visually but keep it for :placeholder-shown state */
+.input-group input::placeholder,
+.input-group textarea::placeholder {
+  @apply text-transparent select-none;
+}
+.input-group input:focus::placeholder,
+.input-group textarea:focus::placeholder {
+  @apply text-gray-400 delay-100 transition-colors;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--gray-200);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-300);
 }
