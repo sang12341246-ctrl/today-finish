@@ -13,17 +13,19 @@ interface Feedback {
 
 interface TeacherFeedbackProps {
     homeworkId: string;
+    imageUrls?: string[];
     onClose?: () => void;
+    onImagesDeleted?: () => void;
 }
 
 const REACTION_TYPES = [
     { type: 'clap', emoji: '👏', label: '참 잘했어요' },
     { type: 'heart', emoji: '❤️', label: '멋져요' },
     { type: 'star', emoji: '⭐', label: '최고예요' },
-    { type: 'check', emoji: '✅', label: '확인완료' },
+    { type: 'check', emoji: '✅', label: '확인완료 (사진 삭제)' },
 ];
 
-export function TeacherFeedback({ homeworkId, onClose }: TeacherFeedbackProps) {
+export function TeacherFeedback({ homeworkId, imageUrls, onClose, onImagesDeleted }: TeacherFeedbackProps) {
     const [comment, setComment] = useState('');
     const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
     const [loading, setLoading] = useState(false);
@@ -68,33 +70,65 @@ export function TeacherFeedback({ homeworkId, onClose }: TeacherFeedbackProps) {
         if (!comment.trim() && !reactionType) return;
 
         setLoading(true);
-        const { error } = await supabase
-            .from('premium_feedback')
-            .insert({
-                homework_id: homeworkId,
-                content: comment.trim(),
-                reaction_type: reactionType || selectedReaction,
-            });
 
-        if (!error) {
+        const rType = reactionType || selectedReaction;
+
+        try {
+            // 1. 피드백 남기기
+            const { error: feedbackError } = await supabase
+                .from('premium_feedback')
+                .insert({
+                    homework_id: homeworkId,
+                    content: comment.trim(),
+                    reaction_type: rType,
+                });
+
+            if (feedbackError) throw feedbackError;
+
+            // 2. [가성비 폭파 시스템] 선생님 확인 시 사진 즉시 지우기
+            // 이미지가 남아있을 때만 실행
+            if (imageUrls && imageUrls.length > 0) {
+                // 스토리지 파일 삭제를 위해 경로(Key) 추출
+                const filePaths = imageUrls.map(url => {
+                    const parts = url.split('/premium-photos/');
+                    return parts.length > 1 ? parts[1] : null;
+                }).filter(Boolean) as string[];
+
+                if (filePaths.length > 0) {
+                    await supabase.storage.from('premium-photos').remove(filePaths);
+                }
+
+                // DB의 image_urls를 빈 배열로 밀어버리고 확인 마킹 추가
+                await supabase
+                    .from('premium_homeworks')
+                    .update({
+                        image_urls: [],
+                        description: `[선생님 확인 완료 - 비용 절감을 위해 사진이 자동 폭파되었습니다 💣]\n\n학생: `
+                    })
+                    .eq('id', homeworkId);
+
+                if (onImagesDeleted) onImagesDeleted();
+            }
+
             setComment('');
             setSelectedReaction(null);
 
-            const rType = reactionType || selectedReaction;
             const emoji = REACTION_TYPES.find(r => r.type === rType)?.emoji || '✅';
             setStampEmoji(emoji);
             setShowStamp(true);
-            toast.success('피드백을 성공적으로 남겼습니다! 🎉');
+            toast.success('피드백 전송 및 사진 자동 비우기 완료! 🗑️');
 
             setTimeout(() => {
                 setShowStamp(false);
                 if (onClose) onClose();
-            }, 1000); // 1초 후 자동 닫기
+            }, 1500);
 
-        } else {
-            toast.error('피드백 저장 중 오류가 발생했습니다.');
+        } catch (error) {
+            console.error('Feedback & Delete error:', error);
+            toast.error('오류가 발생했습니다.');
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     return (
