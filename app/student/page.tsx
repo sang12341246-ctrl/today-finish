@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import { triggerSimpleConfetti, triggerConfetti } from '@/lib/confetti';
 import { supabase } from '@/lib/supabase';
 import toast from 'react-hot-toast';
+import imageCompression from 'browser-image-compression';
 
 export default function StudentPage() {
     const router = useRouter();
@@ -110,13 +111,29 @@ export default function StudentPage() {
 
             // 1. Upload Photo if selected
             if (selectedFile) {
-                const fileExt = selectedFile.name.split('.').pop();
-                // Use English, numeric, and timestamp only for safe storage path
-                const filePath = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+                // 초고율 나노 압축 적용 (0.1MB = 100KB 제한)
+                let fileToUpload = selectedFile;
+                try {
+                    const options = {
+                        maxSizeMB: 0.1,
+                        maxWidthOrHeight: 1920,
+                        useWebWorker: true,
+                        fileType: "image/webp",
+                    };
+                    const compressedFile = await imageCompression(selectedFile, options);
+                    fileToUpload = new File([compressedFile], selectedFile.name.replace(/\.[^/.]+$/, ".webp"), {
+                        type: "image/webp",
+                    });
+                } catch (cmpError) {
+                    console.error('Compression error:', cmpError);
+                }
+
+                const fileExt = fileToUpload.name.split('.').pop() || 'webp';
+                const filePath = `personal_${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
 
                 const { error: uploadError } = await supabase.storage
                     .from('study-photos')
-                    .upload(filePath, selectedFile);
+                    .upload(filePath, fileToUpload);
 
                 if (uploadError) {
                     throw uploadError;

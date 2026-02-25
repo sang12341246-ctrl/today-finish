@@ -213,11 +213,11 @@ export default function GroupStudentPage() {
                 setIsCompressing(true);
                 for (let i = 0; i < totalFiles; i++) {
                     const file = selectedFiles[i];
-                    const options = { maxSizeMB: 1, maxWidthOrHeight: 1920, useWebWorker: true };
+                    const options = { maxSizeMB: 0.1, maxWidthOrHeight: 1920, useWebWorker: true, fileType: "image/webp" as string };
 
                     try {
                         const compressedFile = await imageCompression(file, options);
-                        const finalFile = new File([compressedFile], file.name, { type: file.type });
+                        const finalFile = new File([compressedFile], file.name.replace(/\.[^/.]+$/, ".webp"), { type: "image/webp" });
                         processedFiles.push(finalFile);
                     } catch (cmpError) {
                         console.error('Compression error:', cmpError);
@@ -230,7 +230,7 @@ export default function GroupStudentPage() {
             if (processedFiles.length > 0) {
                 for (let i = 0; i < processedFiles.length; i++) {
                     const file = processedFiles[i];
-                    const fileExt = file.name.split('.').pop();
+                    const fileExt = file.name.split('.').pop() || "webp";
                     const filePath = `group_${groupId}/${studentName}_${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
 
                     const { error: uploadError } = await supabase.storage.from('premium-photos').upload(filePath, file);

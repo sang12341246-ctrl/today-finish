@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.997.0",
+    "@aws-sdk/s3-request-presigner": "^3.997.0",
     "@radix-ui/react-slot": "^1.2.4",
     "@supabase/supabase-js": "^2.97.0",
     "@tosspayments/payment-widget-sdk": "^0.12.1",
