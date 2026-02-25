@@ -143,7 +143,7 @@ export default function Home() {
     setLoading(true);
     try {
       // DB에서 방 이름으로 조회
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("rooms")
         .select("id, password")
         .eq("room_name", roomName.trim())
@@ -247,12 +247,12 @@ export default function Home() {
               <input
                 type="text"
                 id="roomName"
-                placeholder="방 이름 (고유 명칭) 🏠"
+                placeholder="우리 가족(또는 학원) 방 이름 🏠"
                 value={roomName}
                 onChange={(e) => setRoomName(e.target.value)}
                 disabled={loading || (!isCreating && !!lockoutEndTime)}
               />
-              <label htmlFor="roomName">방 이름 (고유 명칭) 🏠</label>
+              <label htmlFor="roomName">우리 가족(또는 학원) 방 이름 🏠</label>
               {isCreating && (
                 <p className="text-xs text-gray-400 mt-2 ml-1">기억하기 쉬운 단일 명칭을 추천합니다.</p>
               )}
@@ -289,16 +289,17 @@ export default function Home() {
 
             {/* 4. 자녀 이름 (로그인 모드일 때만 표시) */}
             {!isCreating && (
-              <div className="input-group animate-in fade-in slide-in-from-top-2">
+              <div className="input-group animate-in fade-in slide-in-from-top-2 text-left">
                 <input
                   type="text"
                   id="studentName"
-                  placeholder="자녀 이름 (학생 입장 시 필수) 👤"
+                  placeholder="당신의 이름 (또는 닉네임) 👤"
                   value={studentName}
                   onChange={(e) => setStudentName(e.target.value)}
                   disabled={loading || !!lockoutEndTime}
                 />
-                <label htmlFor="studentName">자녀 이름 (학생 입장 시 필수) 👤</label>
+                <label htmlFor="studentName">당신의 이름 (또는 닉네임) 👤</label>
+                <p className="text-xs text-gray-400 mt-2 ml-1">학생 또는 부모님의 이름을 적어주세요</p>
               </div>
             )}
           </div>
@@ -334,7 +335,12 @@ export default function Home() {
 
           {/* 단체방으로 이동 (하단 분리) */}
           {!isCreating && (
-            <div className="w-full border-t border-gray-100 pt-6 mt-6 flex flex-col items-center">
+            <div className="w-full mt-6 flex flex-col items-center">
+              <div className="relative flex w-full items-center mb-6">
+                <div className="flex-grow border-t border-gray-200"></div>
+                <span className="flex-shrink-0 mx-4 text-gray-400 text-xs font-semibold">또는 (OR)</span>
+                <div className="flex-grow border-t border-gray-200"></div>
+              </div>
               <Link
                 href="/group"
                 className="group flex w-full items-center justify-center rounded-2xl bg-gray-800 py-4 text-sm font-bold text-white shadow-sm transition-all hover:bg-gray-900 active:scale-[0.98]"
@@ -345,6 +351,16 @@ export default function Home() {
             </div>
           )}
         </div>
+
+        {/* Footer */}
+        <footer className="mt-8 text-center text-gray-400 text-xs w-full max-w-md">
+          <p className="mb-1">
+            <span className="cursor-pointer hover:underline">이용약관</span>
+            <span className="mx-2">|</span>
+            <span className="cursor-pointer hover:underline">개인정보처리방침</span>
+          </p>
+          <p>Copyright &copy; 2026 엄전끝. All rights reserved.</p>
+        </footer>
       </div>
     </PageTransition>
   );
