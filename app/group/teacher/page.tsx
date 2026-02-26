@@ -86,7 +86,7 @@ export default function PremiumTeacherPage() {
                 <div className="w-full max-w-5xl space-y-8 animate-in fade-in zoom-in duration-500">
                     <div className="flex items-center justify-between pt-4">
                         <Link href="/" className="text-gray-500 hover:text-gray-900 font-medium">
-                            &larr; 홈화면으로
+                            &larr; 메인으로
                         </Link>
                         <div className="bg-blue-50 text-toss-blue text-sm px-4 py-1.5 rounded-full font-bold shadow-sm border border-blue-100 italic">
                             {groupName} 단체방 선생님
