@@ -27,7 +27,7 @@ export default function PremiumTeacherPage() {
         const gName = localStorage.getItem('premium_group_name');
 
         if (!id) {
-            router.push('/group/role-select');
+            router.push('/');
             return;
         }
 
@@ -85,8 +85,8 @@ export default function PremiumTeacherPage() {
             <main className="flex min-h-screen flex-col items-center p-6 bg-gray-50 pb-24">
                 <div className="w-full max-w-5xl space-y-8 animate-in fade-in zoom-in duration-500">
                     <div className="flex items-center justify-between pt-4">
-                        <Link href="/group/role-select" className="text-gray-500 hover:text-gray-900 font-medium">
-                            &larr; 역할 선택
+                        <Link href="/" className="text-gray-500 hover:text-gray-900 font-medium">
+                            &larr; 홈화면으로
                         </Link>
                         <div className="bg-blue-50 text-toss-blue text-sm px-4 py-1.5 rounded-full font-bold shadow-sm border border-blue-100 italic">
                             {groupName} 단체방 선생님
