@@ -28,40 +28,73 @@ export async function GET(request: Request) {
 
         if (fetchError) throw fetchError;
 
-        if (!targetHomeworks || targetHomeworks.length === 0) {
+        let totalDeleted = 0;
+
+        // 2. 단체방 숙제(premium_homeworks) 스토리지에서 파일 지우고 DB 업데이트
+        if (targetHomeworks && targetHomeworks.length > 0) {
+            for (const homework of targetHomeworks) {
+                const imageUrls = homework.image_urls as string[];
+                if (imageUrls && imageUrls.length > 0) {
+                    const filePaths = imageUrls.map(url => {
+                        const parts = url.split('/premium-photos/');
+                        return parts.length > 1 ? parts[1] : null;
+                    }).filter(Boolean) as string[];
+
+                    if (filePaths.length > 0) {
+                        await supabase.storage.from('premium-photos').remove(filePaths);
+                    }
+                }
+
+                // DB 업데이트: 이미지 배열 초기화 및 안내 문구 삽입
+                await supabase
+                    .from('premium_homeworks')
+                    .update({
+                        image_urls: [],
+                        description: `[시스템 자동 정리 - 스토리지 확보를 위해 24시간이 경과된 사진이 영구 삭제되었습니다 💣]\n\n학생: `
+                    })
+                    .eq('id', homework.id);
+
+                totalDeleted += imageUrls.length;
+            }
+        }
+
+        // 3. 개인방/부모님용(study_logs) 스토리지에서 파일 지우고 DB 업데이트
+        const { data: targetStudyLogs, error: studyLogsError } = await supabase
+            .from('study_logs')
+            .select('id, image_url')
+            .lt('study_date', twentyFourHoursAgo.toISOString().split('T')[0])
+            .not('image_url', 'is', null)
+            .neq('image_url', 'deleted');
+
+        if (studyLogsError) throw studyLogsError;
+
+        if (targetStudyLogs && targetStudyLogs.length > 0) {
+            for (const log of targetStudyLogs) {
+                if (log.image_url && log.image_url !== 'deleted') {
+                    const parts = log.image_url.split('/study-photos/');
+                    const filePath = parts.length > 1 ? parts[1] : null;
+
+                    if (filePath) {
+                        await supabase.storage.from('study-photos').remove([filePath]);
+                    }
+
+                    // DB 업데이트: deleted 마킹
+                    await supabase
+                        .from('study_logs')
+                        .update({ image_url: 'deleted' })
+                        .eq('id', log.id);
+
+                    totalDeleted += 1;
+                }
+            }
+        }
+
+        if ((!targetHomeworks || targetHomeworks.length === 0) && (!targetStudyLogs || targetStudyLogs.length === 0)) {
             return NextResponse.json({ message: 'No old images to delete' });
         }
 
-        let totalDeleted = 0;
-
-        // 2. 스토리지에서 파일 지우고 DB 업데이트
-        for (const homework of targetHomeworks) {
-            const imageUrls = homework.image_urls as string[];
-            if (imageUrls && imageUrls.length > 0) {
-                const filePaths = imageUrls.map(url => {
-                    const parts = url.split('/premium-photos/');
-                    return parts.length > 1 ? parts[1] : null;
-                }).filter(Boolean) as string[];
-
-                if (filePaths.length > 0) {
-                    await supabase.storage.from('premium-photos').remove(filePaths);
-                }
-            }
-
-            // DB 업데이트: 이미지 배열 초기화 및 안내 문구 삽입
-            await supabase
-                .from('premium_homeworks')
-                .update({
-                    image_urls: [],
-                    description: `[시스템 자동 정리 - 스토리지 확보를 위해 24시간이 경과된 사진이 영구 삭제되었습니다 💣]\n\n학생: `
-                })
-                .eq('id', homework.id);
-
-            totalDeleted += imageUrls.length;
-        }
-
         return NextResponse.json({
-            message: `Successfully deleted ${totalDeleted} images from ${targetHomeworks.length} homeworks.`
+            message: `Successfully deleted ${totalDeleted} images overall. (Premium: ${targetHomeworks?.length || 0}, Study: ${targetStudyLogs?.length || 0})`
         });
 
     } catch (error) {

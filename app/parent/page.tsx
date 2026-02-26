@@ -12,14 +12,14 @@ import toast from 'react-hot-toast';
 
 export default function ParentPage() {
     const router = useRouter();
-    const [logs, setLogs] = useState<{ study_date: string; image_url: string | null; student_name?: string }[]>([]);
+    const [logs, setLogs] = useState<{ id: string; study_date: string; image_url: string | null; student_name?: string }[]>([]);
     const [loading, setLoading] = useState(true);
     const [roomName, setRoomName] = useState('');
 
     // 필터링 상태 추가
     const [selectedStudent, setSelectedStudent] = useState<string>('all');
 
-    const [selectedImage, setSelectedImage] = useState<{ src: string; date: string; studentName?: string } | null>(null);
+    const [selectedImage, setSelectedImage] = useState<{ id: string; src: string; date: string; studentName?: string } | null>(null);
 
     useEffect(() => {
         const savedRoom = localStorage.getItem('premium_group_name');
@@ -33,7 +33,7 @@ export default function ParentPage() {
         const fetchRecords = async (room: string) => {
             const { data, error } = await supabase
                 .from('study_logs')
-                .select('study_date, image_url, student_name')
+                .select('id, study_date, image_url, student_name')
                 .eq('room_name', room)
                 .order('study_date', { ascending: false });
 
@@ -112,7 +112,7 @@ export default function ParentPage() {
         // 날짜 클릭 시 해당 날짜의 첫 번째 (또는 가장 최신) 사진 모달 표시
         const log = filteredLogs.find(l => l.study_date === date);
         if (log?.image_url) {
-            setSelectedImage({ src: log.image_url, date, studentName: log.student_name });
+            setSelectedImage({ id: log.id, src: log.image_url, date, studentName: log.student_name });
         }
     };
 
@@ -214,19 +214,26 @@ export default function ParentPage() {
                             </span>
                         </div>
                         <div
-                            className="relative aspect-video w-full bg-gray-50 rounded-2xl overflow-hidden cursor-pointer hover:opacity-95 transition-opacity border border-gray-50"
+                            className="relative aspect-video w-full bg-gray-50 rounded-2xl overflow-hidden cursor-pointer hover:opacity-95 transition-opacity border border-gray-50 flex items-center justify-center"
                             onClick={() => {
                                 const latest = filteredLogs.find(l => l.image_url);
                                 if (latest?.image_url) {
-                                    setSelectedImage({ src: latest.image_url, date: latest.study_date, studentName: latest.student_name });
+                                    setSelectedImage({ id: latest.id, src: latest.image_url, date: latest.study_date, studentName: latest.student_name });
                                 }
                             }}
                         >
-                            <img
-                                src={filteredLogs.find(l => l.image_url)?.image_url || ''}
-                                alt="공부 인증 사진"
-                                className="object-cover w-full h-full"
-                            />
+                            {filteredLogs.find(l => l.image_url)?.image_url === 'deleted' ? (
+                                <div className="text-center p-4">
+                                    <span className="text-3xl mb-1 block">💣</span>
+                                    <p className="text-xs font-bold text-gray-500">자동 삭제됨</p>
+                                </div>
+                            ) : (
+                                <img
+                                    src={filteredLogs.find(l => l.image_url)?.image_url || ''}
+                                    alt="공부 인증 사진"
+                                    className="object-cover w-full h-full"
+                                />
+                            )}
                             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                         </div>
                     </div>
@@ -256,7 +263,12 @@ export default function ParentPage() {
                     src={selectedImage.src}
                     date={selectedImage.date}
                     studentName={selectedImage.studentName}
+                    logId={selectedImage.id}
                     onClose={() => setSelectedImage(null)}
+                    onImagesDeleted={() => {
+                        setLogs(prev => prev.map(l => l.id === selectedImage.id ? { ...l, image_url: 'deleted' } : l));
+                        setSelectedImage(prev => prev ? { ...prev, src: 'deleted' } : null);
+                    }}
                 />
             )}
         </main>
