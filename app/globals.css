@@ -17,6 +17,27 @@
   --gray-900: #191f28;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #191f28;
+    /* dark gray-900 */
+    --foreground: #f9fafb;
+    /* light gray-50 */
+    --gray-50: #191f28;
+    --gray-100: #333d4b;
+    --gray-200: #4e5968;
+    --gray-300: #6b7684;
+    --gray-400: #8b95a1;
+    --gray-500: #b0b8c1;
+    --gray-600: #d1d6db;
+    --gray-700: #e5e8eb;
+    --gray-800: #f2f4f6;
+    --gray-900: #f9fafb;
+    --toss-blue: #4da0ff;
+    --toss-blue-hover: #7db8ff;
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -39,6 +60,7 @@ body {
   color: var(--foreground);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Floating Label Utilities (Modern Input) */
@@ -48,17 +70,17 @@ body {
 
 .input-group input,
 .input-group textarea {
-  @apply w-full px-5 pb-3 pt-6 rounded-2xl border border-gray-200 bg-gray-50 hover:bg-white focus:bg-white focus:border-toss-blue focus:ring-4 focus:ring-blue-50/50 outline-none transition-all font-medium disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed;
+  @apply w-full px-5 pb-3 pt-6 rounded-2xl border border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-700 focus:bg-white dark:focus:bg-gray-700 focus:border-toss-blue focus:ring-4 focus:ring-blue-500/20 outline-none transition-all font-medium disabled:bg-gray-100 dark:disabled:bg-gray-900 disabled:text-gray-400 dark:disabled:text-gray-600 disabled:cursor-not-allowed;
 }
 
 .input-group label {
   @apply absolute left-5 top-5 text-gray-500 font-bold text-base transition-all duration-200 pointer-events-none origin-left;
 }
 
-.input-group input:focus ~ label,
-.input-group input:not(:placeholder-shown) ~ label,
-.input-group textarea:focus ~ label,
-.input-group textarea:not(:placeholder-shown) ~ label {
+.input-group input:focus~label,
+.input-group input:not(:placeholder-shown)~label,
+.input-group textarea:focus~label,
+.input-group textarea:not(:placeholder-shown)~label {
   @apply -translate-y-3.5 scale-75 text-toss-blue;
 }
 
@@ -67,6 +89,7 @@ body {
 .input-group textarea::placeholder {
   @apply text-transparent select-none;
 }
+
 .input-group input:focus::placeholder,
 .input-group textarea:focus::placeholder {
   @apply text-gray-400 delay-100 transition-colors;
@@ -77,13 +100,16 @@ body {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--gray-200);
   border-radius: 10px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--gray-300);
 }

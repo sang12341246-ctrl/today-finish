@@ -1,0 +1,23 @@
+{
+    "name": "엄전끝 (엄마 나 전부 끝냈어)",
+    "short_name": "엄전끝",
+    "description": "세상에서 제일 쉽게 그날의 공부와 숙제를 인증하는 서비스",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#3182f6",
+    "icons": [
+        {
+            "src": "/icon512_maskable.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/icon512_rounded.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        }
+    ]
+}

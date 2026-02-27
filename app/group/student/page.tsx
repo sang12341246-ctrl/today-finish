@@ -384,6 +384,18 @@ export default function GroupStudentPage() {
     const currentEXP = streak % maxEXP;
     const expPercentage = Math.min((currentEXP / maxEXP) * 100, 100);
 
+    // Dynamic Badge System based on Streak
+    const getBadge = (days: number) => {
+        if (days === 0) return { title: "방금 시작함", icon: "🌱", color: "text-gray-500" };
+        if (days < 3) return { title: "새싹 공부러", icon: "🌿", color: "text-green-500" };
+        if (days < 7) return { title: "작심삼일 돌파!", icon: "🔥", color: "text-orange-500" };
+        if (days < 14) return { title: "불타오르네", icon: "🌟", color: "text-yellow-500" };
+        if (days < 30) return { title: "프로 공부러", icon: "👑", color: "text-purple-500" };
+        return { title: "살아있는 레전드", icon: "🚀", color: "text-red-500" };
+    };
+
+    const currentBadge = getBadge(streak);
+
     return (
         <PageTransition>
             <main className="flex min-h-screen flex-col items-center bg-gray-50 pb-32">
@@ -403,10 +415,15 @@ export default function GroupStudentPage() {
                             {/* EXP Bar (Streak Tracker) */}
                             <div className="bg-white p-5 rounded-3xl shadow-sm border border-orange-100 flex flex-col gap-2 relative overflow-hidden">
                                 <div className="flex justify-between items-end relative z-10">
-                                    <span className="text-sm font-bold text-gray-700 flex items-center gap-1.5">
-                                        <span className="text-lg">🔥</span> 단기 집중 연속 <span className="text-orange-500 text-lg mx-0.5">{streak}</span>일째
-                                    </span>
-                                    <span className="bg-orange-100 text-orange-600 px-2 py-0.5 rounded-md text-xs font-bold">LV.{Math.floor(streak / maxEXP) + 1}</span>
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-bold text-gray-700 flex items-center gap-1.5">
+                                            <span className="text-lg">🔥</span> 단기 집중 연속 <span className="text-orange-500 text-lg mx-0.5">{streak}</span>일째
+                                        </span>
+                                        <span className={`text-xs font-black mt-1 flex items-center gap-1 ${currentBadge.color}`}>
+                                            {currentBadge.icon} 칭호: {currentBadge.title}
+                                        </span>
+                                    </div>
+                                    <span className="bg-orange-100 text-orange-600 px-2 py-0.5 rounded-md text-xs font-bold shadow-sm">LV.{Math.floor(streak / maxEXP) + 1}</span>
                                 </div>
                                 <div className="w-full h-3 bg-orange-50 rounded-full overflow-hidden relative mt-1">
                                     <div

@@ -12,6 +12,23 @@ const notoSansKr = Noto_Sans_KR({
 export const metadata: Metadata = {
   title: "엄마와의 전쟁 끝 - 공부 인증 시작",
   description: "매일 공부를 인증하고 꾸준함을 기르는 우리 가족 학습 매니저",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "엄전끝",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport = {
+  themeColor: "#3182f6",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({

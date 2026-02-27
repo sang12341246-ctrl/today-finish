@@ -17,7 +17,7 @@ interface Homework {
 
 export default function PremiumTeacherPage() {
     const router = useRouter();
-    const [, setGroupId] = useState('');
+    const [groupId, setGroupId] = useState('');
     const [groupName, setGroupName] = useState('');
     const [homeworks, setHomeworks] = useState<Homework[]>([]);
     const [loading, setLoading] = useState(true);
@@ -118,7 +118,7 @@ export default function PremiumTeacherPage() {
                         </div>
                     ) : (
                         <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 min-h-[400px]">
-                            <TeacherDashboardGrid homeworks={homeworks} />
+                            <TeacherDashboardGrid homeworks={homeworks} groupId={groupId} />
                         </div>
                     )}
                 </div>

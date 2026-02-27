@@ -15,12 +15,14 @@ interface Homework {
 
 interface TeacherDashboardGridProps {
     homeworks: Homework[];
+    groupId: string;
 }
 
-export function TeacherDashboardGrid({ homeworks }: TeacherDashboardGridProps) {
+export function TeacherDashboardGrid({ homeworks, groupId }: TeacherDashboardGridProps) {
     const [selectedHw, setSelectedHw] = useState<Homework | null>(null);
     const [processedHws, setProcessedHws] = useState<Homework[]>([]);
     const [showUnreadOnly, setShowUnreadOnly] = useState(false);
+    const [weeklyStats, setWeeklyStats] = useState<Record<string, number>>({});
 
     useEffect(() => {
         const fetchFeedbackCounts = async () => {
@@ -45,8 +47,56 @@ export function TeacherDashboardGrid({ homeworks }: TeacherDashboardGridProps) {
             setProcessedHws(newHws);
         };
 
+        const fetchWeeklyStats = async () => {
+            if (!groupId) return;
+
+            // Calculate Monday to Sunday of the current week in KST
+            const today = new Date();
+            const kstTime = new Date(today.getTime() + 9 * 60 * 60 * 1000);
+            const dayOfWeek = kstTime.getDay(); // 0 is Sunday, 1 is Monday
+            const diffToMonday = kstTime.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+
+            const monday = new Date(kstTime);
+            monday.setDate(diffToMonday);
+            monday.setHours(0, 0, 0, 0);
+            const mondayStr = monday.toISOString().split('T')[0];
+
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+            const sundayStr = sunday.toISOString().split('T')[0];
+
+            const { data, error } = await supabase
+                .from('premium_homeworks')
+                .select('student_name, study_date')
+                .eq('group_id', groupId)
+                .gte('study_date', mondayStr)
+                .lte('study_date', sundayStr);
+
+            if (error) {
+                console.error("Error fetching weekly stats:", error);
+                return;
+            }
+
+            // Count unique days per student this week
+            const stats: Record<string, Set<string>> = {};
+            data?.forEach(row => {
+                if (!stats[row.student_name]) {
+                    stats[row.student_name] = new Set();
+                }
+                stats[row.student_name].add(row.study_date);
+            });
+
+            const finalStats: Record<string, number> = {};
+            Object.keys(stats).forEach(name => {
+                finalStats[name] = stats[name].size;
+            });
+
+            setWeeklyStats(finalStats);
+        };
+
         fetchFeedbackCounts();
-    }, [homeworks]);
+        fetchWeeklyStats();
+    }, [homeworks, groupId]);
 
     // Filter to get the latest homework per student (in case they submit multiple times today)
     const uniqueStudents = processedHws.reduce((acc, curr) => {
@@ -160,12 +210,29 @@ export function TeacherDashboardGrid({ homeworks }: TeacherDashboardGridProps) {
                             {/* Student Name & Meta */}
                             <div className="text-center w-full mt-auto">
                                 <p className="font-extrabold text-gray-900 text-base mb-2 truncate group-hover:text-toss-blue transition-colors">{hw.student_name}</p>
-                                <div className="flex items-center justify-center gap-2">
-                                    <span className={`text-[11px] px-3 py-1 rounded-full font-bold shadow-sm transition-colors
-                                    ${(hw.feedback_count || 0) > 0 ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-orange-50 text-orange-600 border border-orange-100'}
-                                `}>
-                                        {(hw.feedback_count || 0) > 0 ? '검사완료' : '검사 대기중'}
-                                    </span>
+
+                                <div className="flex flex-col gap-2">
+                                    <div className="flex items-center justify-center gap-2">
+                                        <span className={`text-[11px] px-3 py-1 rounded-full font-bold shadow-sm transition-colors
+                                        ${(hw.feedback_count || 0) > 0 ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-orange-50 text-orange-600 border border-orange-100'}
+                                    `}>
+                                            {(hw.feedback_count || 0) > 0 ? '검사완료' : '검사 대기중'}
+                                        </span>
+                                    </div>
+
+                                    {/* Weekly Statistics Bar */}
+                                    <div className="w-full bg-gray-50 p-2 rounded-xl border border-gray-100 mt-1">
+                                        <div className="flex justify-between items-center mb-1 px-1">
+                                            <span className="text-[10px] font-bold text-gray-500">이번 주 성공률</span>
+                                            <span className="text-[10px] font-extrabold text-toss-blue">{weeklyStats[hw.student_name] || 1}/7일</span>
+                                        </div>
+                                        <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                            <div
+                                                className="h-full bg-toss-blue transition-all duration-1000 ease-out rounded-full"
+                                                style={{ width: `${Math.min(((weeklyStats[hw.student_name] || 1) / 7) * 100, 100)}%` }}
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </motion.div>
