@@ -35,7 +35,7 @@ export function TeacherFeedback({ homeworkId, imageUrls, onClose, onImagesDelete
 
     useEffect(() => {
         async function fetchFeedbacks() {
-            const { data, error } = await supabase
+            const { data } = await supabase
                 .from('premium_feedback')
                 .select('*')
                 .eq('homework_id', homeworkId)

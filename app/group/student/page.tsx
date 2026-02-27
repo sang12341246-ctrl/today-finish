@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import toast from 'react-hot-toast';
 import { triggerConfetti, triggerSimpleConfetti } from '@/lib/confetti';
@@ -52,6 +51,7 @@ export default function GroupStudentPage() {
             fetchTodayHomework(storedGroupId, savedName);
             fetchStudentStats(storedGroupId, savedName);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [router]);
 
     useEffect(() => {
@@ -191,8 +191,8 @@ export default function GroupStudentPage() {
     };
 
     const handleFinish = async () => {
-        if (!studentName.trim() || !description.trim()) {
-            toast.error('이름과 숙제 설명을 작성해주세요!');
+        if (!studentName.trim()) {
+            toast.error('이름을 선택하거나 입력해주세요!');
             return;
         }
 
@@ -387,7 +387,7 @@ export default function GroupStudentPage() {
     return (
         <PageTransition>
             <main className="flex min-h-screen flex-col items-center bg-gray-50 pb-32">
-                <div className="w-full max-w-md px-6 flex flex-col items-center">
+                <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl px-6 flex flex-col items-center">
                     <div className="w-full flex items-center justify-between pt-10 mb-6">
                         <a href="/group" onClick={(e) => handleNavigationClick(e, "/group")} className="text-gray-500 hover:text-gray-900 font-medium cursor-pointer flex items-center gap-1 transition-all hover:-translate-x-1">
                             <span className="text-xl">&larr;</span> 뒤로
@@ -478,20 +478,20 @@ export default function GroupStudentPage() {
                                 rows={4}
                                 className="resize-none"
                             />
-                            <label htmlFor="description">오늘의 공부 내용 ✍️</label>
+                            <label htmlFor="description">오늘의 공부 내용 ✍️ <span className="text-gray-400 font-medium">(선택)</span></label>
                         </div>
 
                         <div className="space-y-3">
                             <div className="flex justify-between items-end mb-1 ml-1">
                                 <label className="text-sm font-bold text-gray-700">
-                                    인증 사진 📸 {existingHwId && <span className="text-toss-blue font-semibold">(추가 가능)</span>}
+                                    인증 사진 📸 <span className="text-gray-400 font-medium">(선택)</span> {existingHwId && <span className="text-toss-blue font-semibold">(추가 가능)</span>}
                                 </label>
                                 <span className="text-xs font-bold px-2 py-1 bg-gray-100 text-gray-500 rounded-md">
                                     {existingImageUrls.length + selectedFiles.length} / {MAX_IMAGES}장
                                 </span>
                             </div>
 
-                            <div className="grid grid-cols-3 gap-2">
+                            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                                 {/* Existing Images */}
                                 {existingImageUrls.map((url, i) => (
                                     <div key={`existing-${i}`} className="relative aspect-square rounded-xl overflow-hidden group shadow-sm border border-gray-100">
@@ -576,13 +576,13 @@ export default function GroupStudentPage() {
                     </div>
 
                     <div className="fixed bottom-0 left-0 right-0 p-5 bg-white/80 backdrop-blur-md border-t border-gray-100 z-30 pb-safe">
-                        <div className="max-w-md mx-auto">
+                        <div className="max-w-md md:max-w-2xl lg:max-w-3xl mx-auto">
                             <button
                                 onClick={handleFinish}
-                                disabled={uploading || !studentName.trim() || !description.trim() || (existingImageUrls.length === 0 && selectedFiles.length === 0)}
+                                disabled={uploading || !studentName.trim()}
                                 className={`
                                     w-full py-4 rounded-2xl text-lg font-extrabold shadow-lg transition-all flex flex-col items-center justify-center relative overflow-hidden h-[60px]
-                                    ${uploading || !studentName.trim() || !description.trim() || (existingImageUrls.length === 0 && selectedFiles.length === 0)
+                                    ${uploading || !studentName.trim()
                                         ? 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none border border-gray-200'
                                         : 'bg-toss-blue hover:bg-toss-blue-hover text-white shadow-blue-500/20 active:scale-[0.98]'
                                     }

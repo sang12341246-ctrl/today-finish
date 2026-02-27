@@ -144,7 +144,7 @@ export default function GroupPasswordPage() {
 
         setLoading(true);
         try {
-            const { data, error } = await supabase
+            const { data } = await supabase
                 .from("rooms")
                 .select("id, password")
                 .eq("room_name", roomName.trim())

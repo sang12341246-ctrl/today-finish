@@ -28,6 +28,7 @@ export default function ParentPage() {
             router.push('/');
             return;
         }
+        // eslint-disable-next-line
         setRoomName(savedRoom);
 
         const fetchRecords = async (room: string) => {
@@ -131,9 +132,11 @@ export default function ParentPage() {
     };
 
     return (
-        <main className="flex min-h-screen flex-col items-center p-6 bg-gray-50">
-            <div className="w-full max-w-md space-y-6">
-                <div className="flex items-center justify-between pt-4">
+        <main className="flex min-h-screen flex-col items-center p-6 bg-gray-50 pb-20">
+            <div className="w-full max-w-md md:max-w-4xl lg:max-w-5xl space-y-6 md:space-y-0 md:grid md:grid-cols-2 md:gap-6">
+
+                {/* Header (Span full width) */}
+                <div className="md:col-span-2 flex items-center justify-between pt-4 pb-2">
                     <Link href="/" className="text-gray-500 hover:text-gray-900 font-medium">
                         &larr; 메인으로
                     </Link>
@@ -153,106 +156,112 @@ export default function ParentPage() {
                     </button>
                 </div>
 
-                <div className="text-center space-y-4">
-                    <div className="flex flex-col items-center gap-3">
-                        <div className="inline-flex px-4 py-1.5 bg-white rounded-full shadow-sm border border-gray-100 text-sm text-gray-500">
-                            🏫 방 이름: <span className="font-bold text-gray-800 ml-1">{roomName}</span>
-                        </div>
+                {/* Left Column (Stats & Heatmap) */}
+                <div className="space-y-6">
+                    <div className="text-center space-y-4">
+                        <div className="flex flex-col items-center gap-3">
+                            <div className="inline-flex px-4 py-1.5 bg-white rounded-full shadow-sm border border-gray-100 text-sm text-gray-500">
+                                🏫 방 이름: <span className="font-bold text-gray-800 ml-1">{roomName}</span>
+                            </div>
 
-                        {/* 학생 필터링 드롭다운 */}
-                        <div className="relative w-full max-w-[200px] animate-in fade-in slide-in-from-top-2">
-                            <select
-                                value={selectedStudent}
-                                onChange={(e) => setSelectedStudent(e.target.value)}
-                                className="w-full appearance-none bg-white border border-gray-200 text-gray-700 py-2.5 px-4 pr-10 rounded-xl leading-tight focus:outline-none focus:ring-2 focus:ring-toss-blue focus:border-toss-blue font-medium shadow-sm cursor-pointer transition-all"
-                            >
-                                <option value="all">👨‍👩‍👧‍👦 전체 학생 모아보기</option>
-                                {students.map(student => (
-                                    <option key={student} value={student}>
-                                        👤 {student} 기록만 보기
-                                    </option>
-                                ))}
-                            </select>
-                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
-                                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                                </svg>
+                            {/* 학생 필터링 드롭다운 */}
+                            <div className="relative w-full max-w-[200px] animate-in fade-in slide-in-from-top-2">
+                                <select
+                                    value={selectedStudent}
+                                    onChange={(e) => setSelectedStudent(e.target.value)}
+                                    className="w-full appearance-none bg-white border border-gray-200 text-gray-700 py-2.5 px-4 pr-10 rounded-xl leading-tight focus:outline-none focus:ring-2 focus:ring-toss-blue focus:border-toss-blue font-medium shadow-sm cursor-pointer transition-all"
+                                >
+                                    <option value="all">👨‍👩‍👧‍👦 전체 학생 모아보기</option>
+                                    {students.map(student => (
+                                        <option key={student} value={student}>
+                                            👤 {student} 기록만 보기
+                                        </option>
+                                    ))}
+                                </select>
+                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                                    </svg>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div className="bg-gradient-to-br from-toss-blue to-blue-600 rounded-3xl p-6 text-white shadow-xl transform transition-transform hover:scale-[1.02]">
-                        <h2 className="text-lg font-medium opacity-90 mb-1">
-                            {selectedStudent === 'all' ? '우리가족/학급 연속 공부일 🔥' : `${selectedStudent} 최고 연속 기록 🔥`}
-                        </h2>
-                        <p className="text-5xl font-extrabold tracking-tight">
-                            {streak}일째
-                        </p>
-                        <p className="text-sm mt-3 opacity-80 font-medium">
-                            {getStreakMessage(streak)}
-                        </p>
-                    </div>
-                </div>
-
-                <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                    <Heatmap
-                        logs={filteredLogs.map(l => ({ date: l.study_date, hasImage: !!l.image_url }))}
-                        onDateClick={handleDateClick}
-                    />
-                </div>
-
-                {/* Recent Photo Section */}
-                {filteredLogs.find(l => l.image_url) && (
-                    <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 space-y-3">
-                        <div className="flex items-center justify-between">
-                            <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                                📸 최근 인증 사진
-                            </h3>
-                            <span className="text-xs text-gray-400">
-                                {filteredLogs.find(l => l.image_url)?.study_date}
-                                {filteredLogs.find(l => l.image_url)?.student_name ? ` (${filteredLogs.find(l => l.image_url)?.student_name})` : ''}
-                            </span>
-                        </div>
-                        <div
-                            className="relative aspect-video w-full bg-gray-50 rounded-2xl overflow-hidden cursor-pointer hover:opacity-95 transition-opacity border border-gray-50 flex items-center justify-center"
-                            onClick={() => {
-                                const latest = filteredLogs.find(l => l.image_url);
-                                if (latest?.image_url) {
-                                    setSelectedImage({ id: latest.id, src: latest.image_url, date: latest.study_date, studentName: latest.student_name });
-                                }
-                            }}
-                        >
-                            {filteredLogs.find(l => l.image_url)?.image_url === 'deleted' ? (
-                                <div className="text-center p-4">
-                                    <span className="text-3xl mb-1 block">💣</span>
-                                    <p className="text-xs font-bold text-gray-500">자동 삭제됨</p>
-                                </div>
-                            ) : (
-                                <img
-                                    src={filteredLogs.find(l => l.image_url)?.image_url || ''}
-                                    alt="공부 인증 사진"
-                                    className="object-cover w-full h-full"
-                                />
-                            )}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                        </div>
-                    </div>
-                )}
-
-                <div className="shadow-xl rounded-3xl overflow-hidden bg-white">
-                    <Calendar markedDates={markedDates} logs={filteredLogs} onDateClick={handleDateClick} />
-                </div>
-
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-toss-blue font-bold">
-                            {markedDates.length}
-                        </div>
-                        <div>
-                            <p className="font-bold text-gray-900">
-                                {selectedStudent === 'all' ? '이번 달 함께 공부한 날' : '이번 달 출석일'}
+                        <div className="bg-gradient-to-br from-toss-blue to-blue-600 rounded-3xl p-6 text-white shadow-xl transform transition-transform hover:scale-[1.02]">
+                            <h2 className="text-lg font-medium opacity-90 mb-1">
+                                {selectedStudent === 'all' ? '우리가족/학급 연속 공부일 🔥' : `${selectedStudent} 최고 연속 기록 🔥`}
+                            </h2>
+                            <p className="text-5xl font-extrabold tracking-tight">
+                                {streak}일째
                             </p>
-                            <p className="text-sm text-gray-400">꾸준히 하고 있어요!</p>
+                            <p className="text-sm mt-3 opacity-80 font-medium">
+                                {getStreakMessage(streak)}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                        <Heatmap
+                            logs={filteredLogs.map(l => ({ date: l.study_date, hasImage: !!l.image_url }))}
+                            onDateClick={handleDateClick}
+                        />
+                    </div>
+                </div>
+
+                {/* Right Column (Calendar & Image) */}
+                <div className="space-y-6">
+                    {/* Recent Photo Section */}
+                    {filteredLogs.find(l => l.image_url) && (
+                        <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 space-y-3">
+                            <div className="flex items-center justify-between">
+                                <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                                    📸 최근 인증 사진
+                                </h3>
+                                <span className="text-xs text-gray-400">
+                                    {filteredLogs.find(l => l.image_url)?.study_date}
+                                    {filteredLogs.find(l => l.image_url)?.student_name ? ` (${filteredLogs.find(l => l.image_url)?.student_name})` : ''}
+                                </span>
+                            </div>
+                            <div
+                                className="relative aspect-video w-full bg-gray-50 rounded-2xl overflow-hidden cursor-pointer hover:opacity-95 transition-opacity border border-gray-50 flex items-center justify-center"
+                                onClick={() => {
+                                    const latest = filteredLogs.find(l => l.image_url);
+                                    if (latest?.image_url) {
+                                        setSelectedImage({ id: latest.id, src: latest.image_url, date: latest.study_date, studentName: latest.student_name });
+                                    }
+                                }}
+                            >
+                                {filteredLogs.find(l => l.image_url)?.image_url === 'deleted' ? (
+                                    <div className="text-center p-4">
+                                        <span className="text-3xl mb-1 block">💣</span>
+                                        <p className="text-xs font-bold text-gray-500">자동 삭제됨</p>
+                                    </div>
+                                ) : (
+                                    <img
+                                        src={filteredLogs.find(l => l.image_url)?.image_url || ''}
+                                        alt="공부 인증 사진"
+                                        className="object-cover w-full h-full"
+                                    />
+                                )}
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="shadow-xl rounded-3xl overflow-hidden bg-white">
+                        <Calendar markedDates={markedDates} logs={filteredLogs} onDateClick={handleDateClick} />
+                    </div>
+
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-toss-blue font-bold">
+                                {markedDates.length}
+                            </div>
+                            <div>
+                                <p className="font-bold text-gray-900">
+                                    {selectedStudent === 'all' ? '이번 달 함께 공부한 날' : '이번 달 출석일'}
+                                </p>
+                                <p className="text-sm text-gray-400">꾸준히 하고 있어요!</p>
+                            </div>
                         </div>
                     </div>
                 </div>

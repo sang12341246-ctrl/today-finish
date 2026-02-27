@@ -1,0 +1,71 @@
+﻿
+C:\Users\sang1\OneDrive\諛뷀깢 ?붾㈃\?꾩쟾??.agent\skills\react-components\examples\gold-standard-card.tsx
+  20:10  warning  'cardData' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\sang1\OneDrive\諛뷀깢 ?붾㈃\?꾩쟾??.agent\skills\remotion\examples\WalkthroughComposition.tsx
+   2:9   warning  'Sequence' is defined but never used         @typescript-eslint/no-unused-vars
+  19:15  warning  'width' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  19:22  warning  'height' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\sang1\OneDrive\諛뷀깢 ?붾㈃\?꾩쟾??.agent\skills\remotion\resources\screen-slide-template.tsx
+  16:3  warning  'width' is defined but never used   @typescript-eslint/no-unused-vars
+  17:3  warning  'height' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\sang1\OneDrive\諛뷀깢 ?붾㈃\?꾩쟾??.agent\skills\shadcn-ui\examples\data-table.tsx
+  157:17  warning  Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+C:\Users\sang1\OneDrive\諛뷀깢 ?붾㈃\?꾩쟾??.agent\skills\shadcn-ui\examples\data-table.tsx:157:17
+  155 |   const [rowSelection, setRowSelection] = React.useState({})
+  156 |
+> 157 |   const table = useReactTable({
+      |                 ^^^^^^^^^^^^^ TanStack Table's `useReactTable()` API returns functions that cannot be memoized safely
+  158 |     data,
+  159 |     columns,
+  160 |     onSortingChange: setSorting,  react-hooks/incompatible-library
+
+C:\Users\sang1\OneDrive\諛뷀깢 ?붾㈃\?꾩쟾??app\group\page.tsx
+  147:27  warning  'error' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\sang1\OneDrive\諛뷀깢 ?붾㈃\?꾩쟾??app\group\student\page.tsx
+   5:8  warning  'Link' is defined but never used                                                                                      @typescript-eslint/no-unused-vars
+  55:8  warning  React Hook useEffect has a missing dependency: 'fetchStudentStats'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\sang1\OneDrive\諛뷀깢 ?붾㈃\?꾩쟾??app\group\teacher\page.tsx
+  20:12  warning  'groupId' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\sang1\OneDrive\諛뷀깢 ?붾㈃\?꾩쟾??app\parent\page.tsx
+   31:9   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\sang1\OneDrive\諛뷀깢 ?붾㈃\?꾩쟾??app\parent\page.tsx:31:9
+  29 |             return;
+  30 |         }
+> 31 |         setRoomName(savedRoom);
+     |         ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  32 |
+  33 |         const fetchRecords = async (room: string) => {
+  34 |             const { data, error } = await supabase  react-hooks/set-state-in-effect
+  238:37  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @next/next/no-img-element
+
+C:\Users\sang1\OneDrive\諛뷀깢 ?붾㈃\?꾩쟾??app\success\page.tsx
+  3:10  warning  'useEffect' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\sang1\OneDrive\諛뷀깢 ?붾㈃\?꾩쟾??components\PremiumHomeworkModal.tsx
+   69:41  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  105:53  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\sang1\OneDrive\諛뷀깢 ?붾㈃\?꾩쟾??components\TeacherDashboardGrid.tsx
+  140:41  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\sang1\OneDrive\諛뷀깢 ?붾㈃\?꾩쟾??components\TeacherFeedback.tsx
+  38:27  warning  'error' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+??18 problems (1 error, 17 warnings)
+

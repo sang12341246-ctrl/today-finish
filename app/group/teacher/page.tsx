@@ -17,7 +17,7 @@ interface Homework {
 
 export default function PremiumTeacherPage() {
     const router = useRouter();
-    const [groupId, setGroupId] = useState('');
+    const [, setGroupId] = useState('');
     const [groupName, setGroupName] = useState('');
     const [homeworks, setHomeworks] = useState<Homework[]>([]);
     const [loading, setLoading] = useState(true);
