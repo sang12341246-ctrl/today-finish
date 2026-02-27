@@ -355,9 +355,9 @@ export default function Home() {
         {/* Footer */}
         <footer className="mt-8 text-center text-gray-400 text-xs w-full max-w-md">
           <p className="mb-1">
-            <span className="cursor-pointer hover:underline">이용약관</span>
+            <Link href="/terms" className="hover:underline text-gray-500 hover:text-gray-700 transition-colors">이용약관</Link>
             <span className="mx-2">|</span>
-            <span className="cursor-pointer hover:underline">개인정보처리방침</span>
+            <Link href="/privacy" className="hover:underline text-gray-500 hover:text-gray-700 md:font-semibold text-toss-blue transition-colors">개인정보처리방침</Link>
           </p>
           <p>Copyright &copy; 2026 엄전끝. All rights reserved.</p>
         </footer>
