@@ -133,7 +133,12 @@ export default function GroupPasswordPage() {
         if (lockoutEndTime) return;
 
         if (!roomName.trim() || !password.trim()) {
-            toast.error('단체방 이름과 암호를 모두 입력해주세요! 🔒');
+            toast.error('선생님! 방 이름과 PIN 번호를 설정해주세요 🏫');
+            return;
+        }
+
+        if (!/^\d{4}$/.test(password.trim())) {
+            toast.error("PIN 번호는 숫자 4자리여야 합니다! (예: 1234)");
             return;
         }
 
@@ -230,7 +235,7 @@ export default function GroupPasswordPage() {
                             {isCreating ? "신규 단체방 만들기" : "단체방 입장"}
                         </h1>
                         <p className="text-gray-500 font-medium">
-                            {isCreating ? "학급이나 학원을 위한 새로운 방을 만드세요." : "우리 단체방 이름과 암호를 입력해주세요."}
+                            {isCreating ? "학급이나 학원을 위한 새로운 방을 만드세요." : "우리 단체방 이름과 4자리 PIN을 입력해주세요."}
                         </p>
                     </div>
 
@@ -283,7 +288,10 @@ export default function GroupPasswordPage() {
                                 placeholder="단체방 이름 🏫"
                                 disabled={loading || (!isCreating && !!lockoutEndTime)}
                                 onKeyDown={(e) => {
-                                    if (!isCreating && e.key === 'Enter' && role === 'teacher') handleEntry();
+                                    if (e.key === 'Enter') {
+                                        if (isCreating) handleCreateRoom();
+                                        else handleEntry();
+                                    }
                                 }}
                             />
                             <label htmlFor="roomName">단체방 이름 🏫</label>
@@ -295,15 +303,21 @@ export default function GroupPasswordPage() {
                                 id="password"
                                 type="password"
                                 value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                placeholder="단체방 암호 🔑"
+                                onChange={(e) => setPassword(e.target.value.replace(/[^0-9]/g, '').slice(0, 4))}
+                                placeholder="방 PIN (숫자 4자리) 🔒"
                                 disabled={loading || (!isCreating && !!lockoutEndTime)}
-                                className="tracking-widest"
+                                className="tracking-[0.5em] font-mono text-lg"
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                maxLength={4}
                                 onKeyDown={(e) => {
-                                    if (!isCreating && e.key === 'Enter' && role === 'teacher') handleEntry();
+                                    if (e.key === 'Enter') {
+                                        if (isCreating) handleCreateRoom();
+                                        else handleEntry();
+                                    }
                                 }}
                             />
-                            <label htmlFor="password">단체방 암호 🔑</label>
+                            <label htmlFor="password">방 PIN (숫자 4자리) 🔒</label>
                         </div>
 
                         {/* 3. 개설자 이름 (방 만들기 모드일 때만 표시) */}

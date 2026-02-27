@@ -83,7 +83,12 @@ export default function Home() {
   // 새로운 방 만들기 로직
   const handleCreateRoom = async () => {
     if (!roomName.trim() || !password.trim() || !creatorName.trim()) {
-      toast.error("방 이름, 암호, 개설자 이름을 모두 입력해주세요!");
+      toast.error("방 이름, PIN 번호, 개설자 이름을 모두 입력해주세요!");
+      return;
+    }
+
+    if (!/^\d{4}$/.test(password.trim())) {
+      toast.error("PIN 번호는 숫자 4자리여야 합니다! (예: 1234)");
       return;
     }
 
@@ -131,7 +136,12 @@ export default function Home() {
     if (lockoutEndTime) return;
 
     if (!roomName.trim() || !password.trim()) {
-      toast.error("방 이름과 암호를 모두 입력해주세요!");
+      toast.error("방 이름과 PIN 번호를 모두 입력해주세요!");
+      return;
+    }
+
+    if (!/^\d{4}$/.test(password.trim())) {
+      toast.error("PIN 번호는 숫자 4자리여야 합니다! (예: 1234)");
       return;
     }
 
@@ -225,7 +235,7 @@ export default function Home() {
           </h2>
           <p className="text-gray-500 mb-8 text-center text-sm font-medium">
             {isCreating
-              ? "우리 가족만의 고유한 방 이름과 비밀번호를 설정하세요."
+              ? "우리 가족만의 고유한 방 이름과 숫자 4자리 PIN을 설정하세요."
               : "오늘 공부를 끝내고 쿨하게 인증하세요."}
           </p>
 
@@ -258,18 +268,21 @@ export default function Home() {
               )}
             </div>
 
-            {/* 2. 방 암호 입력 (Floating Label) */}
+            {/* 2. 방 비밀번호(PIN) 입력 (Floating Label) */}
             <div className="input-group text-left">
               <input
                 type="password"
                 id="password"
-                placeholder="방 암호 🔑"
+                placeholder="방 PIN (숫자 4자리) 🔒"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value.replace(/[^0-9]/g, '').slice(0, 4))}
                 disabled={loading || (!isCreating && !!lockoutEndTime)}
-                className="tracking-widest"
+                className="tracking-[0.5em] font-mono text-lg"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={4}
               />
-              <label htmlFor="password">방 암호 🔑</label>
+              <label htmlFor="password">방 PIN (숫자 4자리) 🔒</label>
             </div>
 
             {/* 3. 개설자 이름 (방 만들기 모드일 때만 표시) */}
